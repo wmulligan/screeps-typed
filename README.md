@@ -1,5 +1,13 @@
 # screeps-typed
 
+Based on https://github.com/screepers/Screeps-Typescript-Declarations, but heavily modified to support:
+- TypeScript 2.0 Strict Nulls
+- Full support to extend builtin classes using `prototype`
+- Better usage of generics to avoid Casting
+- Added CPU Cost to all method documentation
+
+## Install
+
 #### Step 1
 If you use [typings](https://github.com/typings/typings), add this to your typings.json:
 ```json
