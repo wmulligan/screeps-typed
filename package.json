@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "typings": "dist/screeps-typed.d.ts",
+  "types": "./dist/screeps-typed.d.ts",
   "scripts": {
     "lint": "tslint",
     "compile": "rm -Rf ./dist && node_modules/.bin/tsc && dts-generator --name screeps-typed --project ./ --out ./dist/screeps-typed.d.ts"
