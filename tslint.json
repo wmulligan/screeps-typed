@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "tslint:latest"
+  ],
+  "rules": {
+    "max-line-length": [true, 140],
+    "no-console": false,
+    "quotemark": [true, "single"],
+    "interface-name": false,
+    "no-namespace": [true, "allow-declarations"],
+    "only-arrow-functions": false
+  }
+}
