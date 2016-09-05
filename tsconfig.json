@@ -3,7 +3,8 @@
     "target": "es5",
     "module": "system",
     "sourceMap": false,
-    "outFile": "./dist/screeps.d.ts"
+    "declaration": false,
+    "outFile": "./dist/screeps-typed.ts"
   },
   "exclude": [
     "node_modules",

@@ -1,0 +1,25 @@
+{
+  "name": "screeps-typed",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "tslint",
+    "compile": "node_modules/.bin/tsc && dts-generator --name screeps-typed --project ./ --out ./dist/screeps-typed.d.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wmulligan/screeps-typed.git"
+  },
+  "author": "Will Mulligan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wmulligan/screeps-typed/issues"
+  },
+  "homepage": "https://github.com/wmulligan/screeps-typed#readme",
+  "devDependencies": {
+    "dts-generator": "^1.7.0",
+    "tslint": "^3.15.1",
+    "typescript": "^2.0.2"
+  }
+}
