@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "tslint",
-    "compile": "node_modules/.bin/tsc && dts-generator --name screeps-typed --project ./ --out ./dist/screeps-typed.d.ts"
+    "compile": "rm -Rf ./dist && node_modules/.bin/tsc && dts-generator --name screeps-typed --project ./ --out ./dist/screeps-typed.d.ts"
   },
   "repository": {
     "type": "git",

@@ -1004,14 +1004,6 @@ interface GCL {
   progressTotal: number;
 
 }
-declare namespace NodeJS {
-    interface Global {
-        TERRAIN_PLAIN: TerrainType;
-        TERRAIN_SPAWN: TerrainType;
-        TERRAIN_WALL: TerrainType;
-    }
-}
-declare var global: NodeJS.Global;
 /**
  * A global object representing world map. Use it to navigate between rooms. The object is accessible via Game.map property.
  */
