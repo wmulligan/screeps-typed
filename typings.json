@@ -1,4 +1,5 @@
 {
   "name": "screeps-typed",
-  "dependencies": {}
+  "dependencies": {},
+  "main": "dist/screeps-typed.d.ts"
 }
