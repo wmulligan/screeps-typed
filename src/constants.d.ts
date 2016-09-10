@@ -188,7 +188,7 @@ interface TerrainType extends String {
 
 // variables since they get defined by us
 declare var TERRAIN_PLAIN: TerrainType;
-declare var TERRAIN_SPAWN: TerrainType;
+declare var TERRAIN_SWAMP: TerrainType;
 declare var TERRAIN_WALL: TerrainType;
 
 // RoomModes

@@ -70,6 +70,17 @@ interface SearchResult {
    */
   readonly ops: number;
 
+  /**
+   * The total cost of the path as derived from `plainCost`, `swampCost` and any given CostMatrix instances.
+   */
+  readonly cost: number;
+
+  /**
+   * If the pathfinder fails to find a complete path, this will be true. Note that `path` will still be populated with a partial path which
+   * represents the closest path it could find given the search parameters.
+   */
+  readonly incomplete: boolean;
+
 }
 
 /**
