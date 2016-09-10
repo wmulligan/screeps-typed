@@ -2,9 +2,10 @@
 
 Based on https://github.com/screepers/Screeps-Typescript-Declarations, but heavily modified to support:
 - TypeScript 2.0 Strict Nulls
-- Full support to extend builtin classes using `prototype`
-- Better usage of generics to avoid Casting
-- Added CPU Cost to all method documentation
+- Full support to extend builtin classes
+- Better usage of generics to avoid casting
+- Added CPU cost to all method documentation
+- More types for better error checking
 
 ## Install
 
@@ -55,4 +56,26 @@ Creep.prototype.init = function (this: Creep, role: string) {
   this.role = role;
   this.run();
 };
+```
+or
+```ts
+class MyCreep extends Creep {
+  init(role: string) {
+    this.role = role;
+    this.run();
+  }
+}
+safeExtendPrototype(Creep, MyCreep);
+
+function safeExtendPrototype(extended: any, extender: any) {
+  let properties: string[] = Object.getOwnPropertyNames(extender.prototype);
+  for (let i in properties) {
+    if (!extended.prototype.hasOwnProperty(properties[i])) {
+      Object.defineProperty(
+        extended.prototype,
+        properties[i],
+        Object.getOwnPropertyDescriptor(extender.prototype, properties[i]));
+    }
+  }
+}
 ```
