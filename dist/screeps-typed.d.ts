@@ -1,6 +1,54 @@
-interface StoreDefinition {
-  [resource: string]: number;
-  energy: number;
+/**
+ * Unique names for objects
+ */
+declare class Name<T> extends String {
+  private readonly __type__: T; // tslint:disable-line
+}
+declare class RoomName extends Name<Room> {
+}
+declare class CreepName extends Name<Creep> {
+}
+declare class FlagName extends Name<Flag> {
+}
+declare class SpawnName extends Name<Spawn> {
+}
+
+// these are inputs into our functions which allow hardcoded strings
+type RoomNameOrString = RoomName | string;
+type CreepNameOrString = CreepName | string;
+type FlagNameOrString = FlagName | string;
+type SpawnNameOrString = SpawnName | string;
+
+/**
+ * Unique ids for objects
+ */
+declare class ObjectId<T> extends String {
+  private readonly __type__: T; // tslint:disable-line
+}
+declare class CreepId extends ObjectId<Creep> {
+}
+declare class ConstructionSiteId extends ObjectId<ConstructionSite> {
+}
+declare class MineralId extends ObjectId<Mineral> {
+}
+declare class NukeId extends ObjectId<Nuke> {
+}
+declare class ResourceId extends ObjectId<Resource> {
+}
+declare class SourceId extends ObjectId<Source> {
+}
+declare class StructureId<T> extends ObjectId<T> {
+}
+
+/**
+ * Used in container, terminal, storage and creep
+ */
+interface StoreContents {
+
+  readonly [resourceType: string]: number;
+
+  readonly energy: number;
+
 }
 
 /**
@@ -11,19 +59,21 @@ interface Owner {
   /**
    * The name of the owner user.
    */
-  username: string;
+  readonly username: string;
 
 }
+
+type SerializedPath = string;
 
 interface LookAtResult {
   type: string;
   constructionSite?: ConstructionSite;
   creep?: Creep;
   energy?: Resource;
-  exit?: any;
+  exit?: FindType<RoomPosition>;
   flag?: Flag;
   source?: Source;
-  structure?: Structure;
+  structure?: Structure<any>;
   terrain?: TerrainType;
 }
 
@@ -108,7 +158,7 @@ interface FindPathOpts {
    * @param costMatrix The current CostMatrix
    * @returns The new CostMatrix to use
    */
-  costCallback?(roomName: string, costMatrix: CostMatrix): CostMatrix;
+  costCallback?(roomName: RoomName, costMatrix: CostMatrix): CostMatrix;
 
 }
 // Responses
@@ -134,7 +184,8 @@ declare const ERR_RCL_NOT_ENOUGH: ResponseCode;
 declare const ERR_GCL_NOT_ENOUGH: ResponseCode;
 
 // Structures
-interface StructureType<T extends Structure> extends String { // tslint:disable-line
+declare class StructureType<T> extends String { // tslint:disable-line
+  private readonly __type__: T; // tslint:disable-line
 }
 
 declare const STRUCTURE_SPAWN: StructureType<Spawn>;
@@ -150,7 +201,7 @@ declare const STRUCTURE_STORAGE: StructureType<StructureStorage>;
 declare const STRUCTURE_TOWER: StructureType<Tower>;
 declare const STRUCTURE_OBSERVER: StructureType<Observer>;
 declare const STRUCTURE_POWER_BANK: StructureType<PowerBank>;
-declare const STRUCTURE_POWER_SPAWN: StructureType<Structure>;
+declare const STRUCTURE_POWER_SPAWN: StructureType<PowerSpawn>;
 declare const STRUCTURE_EXTRACTOR: StructureType<Extractor>;
 declare const STRUCTURE_LAB: StructureType<Lab>;
 declare const STRUCTURE_TERMINAL: StructureType<Terminal>;
@@ -188,9 +239,9 @@ declare const FIND_SOURCES_ACTIVE: FindType<Source>;
 declare const FIND_SOURCES: FindType<Source>;
 declare const FIND_DROPPED_ENERGY: FindType<Resource>;
 declare const FIND_DROPPED_RESOURCES: FindType<Resource>;
-declare const FIND_STRUCTURES: FindType<Structure>;
-declare const FIND_MY_STRUCTURES: FindType<Structure>;
-declare const FIND_HOSTILE_STRUCTURES: FindType<Structure>;
+declare const FIND_STRUCTURES: FindType<Structure<any>>;
+declare const FIND_MY_STRUCTURES: FindType<Structure<any>>;
+declare const FIND_HOSTILE_STRUCTURES: FindType<Structure<any>>;
 declare const FIND_FLAGS: FindType<Flag>;
 declare const FIND_MY_SPAWNS: FindType<Spawn>;
 declare const FIND_HOSTILE_SPAWNS: FindType<Spawn>;
@@ -222,7 +273,7 @@ declare const LOOK_ENERGY: LookType<Resource>;
 declare const LOOK_RESOURCES: LookType<Resource>;
 declare const LOOK_SOURCES: LookType<Source>;
 declare const LOOK_MINERALS: LookType<Mineral>;
-declare const LOOK_STRUCTURES: LookType<Structure>;
+declare const LOOK_STRUCTURES: LookType<Structure<any>>;
 declare const LOOK_FLAGS: LookType<Flag>;
 declare const LOOK_CONSTRUCTION_SITES: LookType<ConstructionSite>;
 declare const LOOK_NUKES: LookType<Nuke>;
@@ -311,48 +362,42 @@ declare const MODE_SIMULATION: RoomModes;
 declare const MODE_SURVIVAL: RoomModes;
 declare const MODE_WORLD: RoomModes;
 declare const MODE_ARENA: RoomModes;
-declare const ConstructionSite: ConstructionSiteConstructor;
-
-interface ConstructionSiteConstructor {
-  prototype: ConstructionSite;
-}
-
 /**
  * A site of a structure which is currently under construction. A construction site can be created using the 'Construct' button at the left
  * of the game field or the Room.createConstructionSite method. To build a structure on the construction site, give a worker creep some
  * amount of energy and perform Creep.build action.
  */
-interface ConstructionSite extends RoomObject {
+declare class ConstructionSite extends RoomObject {
 
   /**
    * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
    */
-  id: string;
+  public readonly id: ConstructionSiteId;
 
   /**
    * Whether this is your own construction site.
    */
-  my: boolean;
+  public readonly my: boolean;
 
   /**
    * An object with the structure’s owner info
    */
-  owner: Owner;
+  public readonly owner: Owner;
 
   /**
    * The current construction progress.
    */
-  progress: number;
+  public readonly progress: number;
 
   /**
    * The total construction progress needed for the structure to be built.
    */
-  progressTotal: number;
+  public readonly progressTotal: number;
 
   /**
    * One of the STRUCTURE_* constants.
    */
-  structureType: StructureType<any>;
+  public readonly structureType: StructureType<any>;
 
   /**
    * CPU cost: CONST
@@ -361,92 +406,86 @@ interface ConstructionSite extends RoomObject {
    *
    * @returns Result Code: OK, ERR_NOT_OWNER
    */
-  remove(): ResponseCode;
+  public remove(): ResponseCode;
 
 }
-declare const Creep: CreepConstructor;
-
-interface CreepConstructor {
-  prototype: Creep;
-}
-
 /**
  * Creeps are your units. Creeps can move, harvest energy, construct structures, attack another creeps, and perform other actions. Each
  * creep consists of up to 50 body parts.
  */
-interface Creep extends RoomObject {
+declare class Creep extends RoomObject {
 
   /**
    * An array describing the creep’s body.
    */
-  body: BodyPart[];
+  public readonly body: BodyPart[];
 
   /**
    * An object with the creep's cargo contents. Each object key is one of the RESOURCE_* constants, values are resources amounts. Use
    * lodash.sum to get the total amount of contents
    */
-  carry: StoreDefinition;
+  public readonly carry: StoreContents;
 
   /**
    * The total amount of resources the creep can carry.
    */
-  carryCapacity: number;
+  public readonly carryCapacity: number;
 
   /**
    * The movement fatigue indicator. If it is greater than zero, the creep cannot move.
    */
-  fatigue: number;
+  public readonly fatigue: number;
 
   /**
    * The current amount of hit points of the creep.
    */
-  hits: number;
+  public readonly hits: number;
 
   /**
    * The maximum amount of hit points of the creep.
    */
-  hitsMax: number;
+  public readonly hitsMax: number;
 
   /**
    * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
    */
-  id: string;
+  public readonly id: CreepId;
 
   /**
    * A shorthand to Memory.creeps[creep.name]. You can use it for quick access the creep’s specific memory data object.
    */
-  memory: CreepMemory;
+  public memory: CreepMemory;
 
   /**
    * Whether it is your creep or foe.
    */
-  my: boolean;
+  public readonly my: boolean;
 
   /**
    * Creep’s name. You can choose the name while creating a new creep, and it cannot be changed later. This name is a hash key to access
    * the creep via the Game.creeps object.
    */
-  name: string;
+  public readonly name: CreepName;
 
   /**
    * An object with the creep’s owner info
    */
-  owner: Owner;
+  public readonly owner: Owner;
 
   /**
    * The text message that the creep was saying at the last tick.
    */
-  saying: string;
+  public readonly saying: string;
 
   /**
    * Whether this creep is still being spawned.
    */
-  spawning: boolean;
+  public readonly spawning: boolean;
 
   /**
    * The remaining amount of game ticks after which the creep will die.
    */
-  ticksToLive: number;
+  public readonly ticksToLive: number;
 
   /**
    * CPU cost: CONST
@@ -458,7 +497,7 @@ interface Creep extends RoomObject {
    * @param target The target object to be attacked.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  attack(target: Creep | Structure): ResponseCode;
+  public attack(target: Creep | Structure<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -470,7 +509,7 @@ interface Creep extends RoomObject {
    * @param target The target controller object.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  attackController(target: Controller): ResponseCode;
+  public attackController(target: Controller): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -482,7 +521,7 @@ interface Creep extends RoomObject {
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART,
    *     ERR_RCL_NOT_ENOUGH
    */
-  build(target: ConstructionSite): ResponseCode;
+  public build(target: ConstructionSite): ResponseCode;
 
   /**
    * CPU cost: NONE
@@ -492,7 +531,7 @@ interface Creep extends RoomObject {
    * @param methodName The name of a creep's method to be cancelled.
    * @returns Result Code: OK, ERR_NOT_FOUND
    */
-  cancelOrder(methodName: string): ResponseCode;
+  public cancelOrder(methodName: string): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -504,7 +543,7 @@ interface Creep extends RoomObject {
    * @param target The target controller object.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE, ERR_NO_BODYPART, ERR_GCL_NOT_ENOUGH
    */
-  claimController(target: Controller): ResponseCode;
+  public claimController(target: Controller): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -516,7 +555,7 @@ interface Creep extends RoomObject {
    * @param target The target structure.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  dismantle(target: Structure): ResponseCode;
+  public dismantle(target: Structure<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -527,7 +566,7 @@ interface Creep extends RoomObject {
    * @param amount The amount of resource units to be dropped. If omitted, all the available carried amount is used.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES
    */
-  drop(resourceType: ResourceType, amount?: number): ResponseCode;
+  public drop(resourceType: ResourceType, amount?: number): ResponseCode;
 
   /**
    * CPU cost: NONE
@@ -537,7 +576,7 @@ interface Creep extends RoomObject {
    * @param type A body part type, one of the following body part constants: MOVE, WORK, CARRY, ATTACK, RANGED_ATTACK, HEAL, TOUGH, CLAIM
    * @returns A number representing the quantity of body parts.
    */
-  getActiveBodyparts(type: BodyPartType): number;
+  public getActiveBodyparts(type: BodyPartType): number;
 
   /**
    * CPU cost: CONST
@@ -550,7 +589,7 @@ interface Creep extends RoomObject {
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_FOUND, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE,
    * ERR_NO_BODYPART
    */
-  harvest(target: Source | Mineral): ResponseCode;
+  public harvest(target: Source | Mineral): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -561,7 +600,7 @@ interface Creep extends RoomObject {
    * @param target The target creep object.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  heal(target: Creep): ResponseCode;
+  public heal(target: Creep): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -571,7 +610,7 @@ interface Creep extends RoomObject {
    * @param direction Direction to move.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_TIRED, ERR_NO_BODYPART
    */
-  move(direction: Direction): ResponseCode;
+  public move(direction: Direction): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -582,7 +621,7 @@ interface Creep extends RoomObject {
    *     serialized string form are accepted.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_FOUND, ERR_INVALID_ARGS, ERR_TIRED, ERR_NO_BODYPART
    */
-  moveByPath(path: PathStep[] | RoomPosition[] | string): ResponseCode;
+  public moveByPath(path: PathStep[] | RoomPosition[] | SerializedPath): ResponseCode;
 
   /**
    * CPU cost: HIGH
@@ -596,7 +635,7 @@ interface Creep extends RoomObject {
    *     serializeMemory, noPathFinding
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_TIRED, ERR_NO_BODYPART, ERR_INVALID_TARGET, ERR_NO_PATH
    */
-  moveTo(x: number, y: number, opts?: MoveToOpts & FindPathOpts): ResponseCode;
+  public moveTo(x: number, y: number, opts?: MoveToOpts & FindPathOpts): ResponseCode;
 
   /**
    * CPU cost: HIGH
@@ -610,7 +649,7 @@ interface Creep extends RoomObject {
    *     serializeMemory, noPathFinding
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_TIRED, ERR_NO_BODYPART, ERR_INVALID_TARGET, ERR_NO_PATH
    */
-  moveTo(target: RoomPosition | RoomObject, opts?: MoveToOpts & FindPathOpts): ResponseCode;
+  public moveTo(target: RoomPosition | RoomObject, opts?: MoveToOpts & FindPathOpts): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -620,7 +659,7 @@ interface Creep extends RoomObject {
    * @param enabled Whether to enable notification or disable.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_INVALID_ARGS
    */
-  notifyWhenAttacked(enabled: boolean): ResponseCode;
+  public notifyWhenAttacked(enabled: boolean): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -631,7 +670,7 @@ interface Creep extends RoomObject {
    * @param target The target object to be picked up.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE
    */
-  pickup(target: Resource): ResponseCode;
+  public pickup(target: Resource): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -642,7 +681,7 @@ interface Creep extends RoomObject {
    * @param target The target object to be attacked.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  rangedAttack(target: Creep | Structure): ResponseCode;
+  public rangedAttack(target: Creep | Structure<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -653,7 +692,7 @@ interface Creep extends RoomObject {
    * @param target The target creep object.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  rangedHeal(target: Creep): ResponseCode;
+  public rangedHeal(target: Creep): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -663,7 +702,7 @@ interface Creep extends RoomObject {
    *
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NO_BODYPART
    */
-  rangedMassAttack(): ResponseCode;
+  public rangedMassAttack(): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -674,7 +713,7 @@ interface Creep extends RoomObject {
    * @param target he target structure to be repaired.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  repair(target: Structure): ResponseCode;
+  public repair(target: Structure<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -686,7 +725,7 @@ interface Creep extends RoomObject {
    * @param target The target controller object to be reserved.
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  reserveController(target: Controller): ResponseCode;
+  public reserveController(target: Controller): ResponseCode;
 
   /**
    * CPU cost: NONE
@@ -698,7 +737,7 @@ interface Creep extends RoomObject {
    * @param toPublic Set to true to allow other players to see this message. Default is false.
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY
    */
-  say(message: string, toPublic?: boolean): ResponseCode;
+  public say(message: string, toPublic?: boolean): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -707,7 +746,7 @@ interface Creep extends RoomObject {
    *
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY
    */
-  suicide(): ResponseCode;
+  public suicide(): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -720,7 +759,7 @@ interface Creep extends RoomObject {
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE,
    *     ERR_INVALID_ARGS
    */
-  transfer(target: Creep | Structure, resourceType: ResourceType, amount?: number): ResponseCode;
+  public transfer(target: Creep | Structure<any>, resourceType: ResourceType, amount?: number): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -733,7 +772,7 @@ interface Creep extends RoomObject {
    * @param target The target controller object to be upgraded.
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  upgradeController(target: Controller): ResponseCode;
+  public upgradeController(target: Controller): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -748,7 +787,7 @@ interface Creep extends RoomObject {
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE,
    *     ERR_INVALID_ARGS
    */
-  withdraw(target: Structure, resourceType: ResourceType, amount?: number): ResponseCode;
+  public withdraw(target: Structure<any>, resourceType: ResourceType, amount?: number): ResponseCode;
 
 }
 
@@ -757,17 +796,17 @@ interface BodyPart {
   /**
    * If the body part is boosted, this property specifies the mineral type which is used for boosting. One of the RESOURCE_* constants.
    */
-  boost: Resource | undefined;
+  readonly boost: Resource | undefined;
 
   /**
    * One of the body part types constants.
    */
-    type: BodyPartType;
+  readonly type: BodyPartType;
 
   /**
    * The remaining amount of hit points of this body part.
    */
-  hits: number;
+  readonly hits: number;
 
 }
 
@@ -794,37 +833,31 @@ interface MoveToOpts {
   noPathFinding: boolean;
 
 }
-declare const Flag: FlagConstructor;
-
-interface FlagConstructor {
-  prototype: Flag;
-}
-
 /**
  * A flag. Flags can be used to mark particular spots in a room. Flags are visible to their owners only.
  */
-interface Flag extends RoomObject {
+declare class Flag extends RoomObject {
 
   /**
    * Flag primary color. One of the COLOR_* constants.
    */
-  color: Color;
+  public readonly color: Color;
 
   /**
    * A shorthand to Memory.flags[flag.name]. You can use it for quick access the flag's specific memory data object.
    */
-  memory: FlagMemory;
+  public memory: FlagMemory;
 
   /**
    * Flag’s name. You can choose the name while creating a new flag, and it cannot be changed later. This name is a hash key to access the
    * spawn via the Game.flags object.
    */
-  name: string;
+  public readonly name: FlagName;
 
   /**
    * Flag secondary color. One of the COLOR_* constants.
    */
-  secondaryColor: Color;
+  public readonly secondaryColor: Color;
 
   /**
    * CPU cost: CONST
@@ -833,7 +866,7 @@ interface Flag extends RoomObject {
    *
    * @returns Always returns OK.
    */
-  remove(): ResponseCode;
+  public remove(): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -844,7 +877,7 @@ interface Flag extends RoomObject {
    * @parma secondaryColor Secondary color of the flag. One of the COLOR_* constants.
    * @returns Result Code: OK, ERR_INVALID_ARGS
    */
-  setColor(color: Color, secondaryColor?: Color): ResponseCode;
+  public setColor(color: Color, secondaryColor?: Color): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -855,7 +888,7 @@ interface Flag extends RoomObject {
    * @param y The Y position in the room.
    * @returns Result Code: OK, ERR_INVALID_TARGET
    */
-  setPosition(x: number, y: number): ResponseCode;
+  public setPosition(x: number, y: number): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -865,69 +898,77 @@ interface Flag extends RoomObject {
    * @param pos Can be a RoomPosition object or any object containing RoomPosition.
    * @returns Result Code: OK, ERR_INVALID_TARGET
    */
-  setPosition(pos: RoomPosition | RoomObject): ResponseCode;
+  public setPosition(pos: RoomPosition | RoomObject): ResponseCode;
 
 }
+declare const Game: Game;
+
 /**
  * The main global game object containing all the gameplay information.
  */
-declare namespace Game {
+interface Game {
 
   /**
    * A hash containing all your construction sites with their id as hash keys.
    */
-  export const constructionSites: {[constructionSiteId: string]: ConstructionSite};
+  readonly constructionSites: {[constructionSiteId: string]: ConstructionSite};
 
   /**
    * An object containing information about your CPU usage.
    */
-  export const cpu: CPU;
+  readonly cpu: CPU;
 
   /**
    * A hash containing all your creeps with creep names as hash keys.
    */
-  export const creeps: {[creepName: string]: Creep};
+  readonly creeps: {[creepName: string]: Creep};
 
   /**
    * A hash containing all your flags with flag names as hash keys.
    */
-  export const flags: {[flagName: string]: Flag};
+  readonly flags: {[flagName: string]: Flag};
 
   /**
    * Your Global Control Level
    */
-  export const gcl: GCL;
+  readonly gcl: GCL;
 
   /**
    * A global object representing world map.
    */
-  // export const map: Game.Map;
+  readonly map: GameMap;
 
   /**
    * A global object representing the in-game market.
    */
-  // export const market: Market;
+  readonly market: Market;
+
+  /**
+   * An object with your global resources that are bound to the account, like subscription tokens. Each object key is a resource constant,
+   * values are resources amounts.
+   */
+  readonly resources: {[resourceType: string]: number};
 
   /**
    * A hash containing all the rooms available to you with room names as hash keys. A room is visible if you have a creep or an owned
    * structure in it.
    */
-  export const rooms: {[roomName: string]: Room};
+  readonly rooms: {[roomName: string]: Room};
 
   /**
    * A hash containing all your spawns with spawn names as hash keys.
    */
-  export const spawns: {[spawnName: string]: Spawn};
+  readonly spawns: {[spawnName: string]: Spawn};
 
   /**
    * A hash containing all your structures with structure id as hash keys.
    */
-  export const structures: {[structureId: string]: Structure};
+  readonly structures: {[structureId: string]: Structure<any>};
 
   /**
    * System game tick counter. It is automatically incremented on every tick.
    */
-  export const time: number;
+  readonly time: number;
 
   /**
    * CPU cost: LOW
@@ -938,7 +979,7 @@ declare namespace Game {
    * @param id The unique identificator.
    * @returns an object instance or null if it cannot be found.
    */
-  export function getObjectById<T>(id: string): T | null;
+  getObjectById<T>(id: ObjectId<T> | string): T | null;
 
   /**
    * CPU cost: CONST
@@ -950,7 +991,7 @@ declare namespace Game {
    * @param groupInterval If set to 0 (default), the notification will be scheduled immediately. Otherwise, it will be grouped with other
    *     notifications and mailed out later using the specified time in minutes.
    */
-  export function notify(message: string, groupInterval?: number): void;
+  notify(message: string, groupInterval?: number): void;
 
 }
 
@@ -962,19 +1003,21 @@ interface CPU {
   /**
    * Your CPU limit depending on your Global Control Level.
    */
-  limit: number;
+  readonly limit: number;
 
   /**
    * An amount of available CPU time at the current game tick. It can be higher than Game.cpu.limit.
    */
-  tickLimit: number;
+  readonly tickLimit: number;
 
   /**
    * An amount of unused CPU accumulated in your bucket.
    */
-  bucket: number;
+  readonly bucket: number;
 
   /**
+   * CPU cost: LOW
+   *
    * Get amount of CPU time used from the beginning of the current game tick. Always returns 0 in the Simulation mode.
    *
    * @returns currently used CPU time as a float number.
@@ -991,23 +1034,23 @@ interface GCL {
   /**
    * The current level.
    */
-  level: number;
+  readonly level: number;
 
   /**
    * The current progress to the next level.
    */
-  progress: number;
+  readonly progress: number;
 
   /**
    * The progress required to reach the next level.
    */
-  progressTotal: number;
+  readonly progressTotal: number;
 
 }
 /**
  * A global object representing world map. Use it to navigate between rooms. The object is accessible via Game.map property.
  */
-declare namespace Game.map {
+interface GameMap {
 
   /**
    * CPU cost: LOW
@@ -1017,7 +1060,7 @@ declare namespace Game.map {
    * @param roomName The room name.
    * @returns The exits information or null if the room not found.
    */
-  export function describeExits(roomName: string): RoomExits | null;
+  describeExits(roomName: RoomNameOrString): RoomExits | null;
 
   /**
    * CPU cost: HIGH
@@ -1030,7 +1073,7 @@ declare namespace Game.map {
    * FIND_EXIT_TOP, FIND_EXIT_RIGHT, FIND_EXIT_BOTTOM, FIND_EXIT_LEFT
    * Or one of the following Result codes: ERR_NO_PATH, ERR_INVALID_ARGS
    */
-  export function findExit(fromRoom: string | Room, toRoom: string | Room): FindType<RoomPosition> | ResponseCode;
+  findExit(fromRoom: RoomNameOrString | Room, toRoom: RoomNameOrString | Room): FindType<RoomPosition> | ResponseCode;
 
   /**
    * CPU cost: HIGH
@@ -1042,7 +1085,7 @@ declare namespace Game.map {
    * @param opts find route options
    * @returns the route array or ERR_NO_PATH code
    */
-  export function findRoute(fromRoom: string | Room, toRoom: string | Room, opts?: FindRouteOpts): RoomPathStep[] | ResponseCode;
+  findRoute(fromRoom: RoomNameOrString | Room, toRoom: RoomNameOrString | Room, opts?: FindRouteOpts): RoomPathStep[] | ResponseCode;
 
   /**
    * CPU cost: NONE
@@ -1054,7 +1097,7 @@ declare namespace Game.map {
    * @param roomName2 The name of the second room.
    * @returns A number of rooms between the given two rooms.
    */
-  export function getRoomLinearDistance(roomName1: string, roomName2: string): number;
+  getRoomLinearDistance(roomName1: RoomNameOrString, roomName2: RoomNameOrString): number;
 
   /**
    * CPU cost: LOW
@@ -1066,7 +1109,7 @@ declare namespace Game.map {
    * @param roomName The room name.
    * @returns One of the following string values: plain, swamp, wall
    */
-  export function getTerrainAt(x: number, y: number, roomName: string): TerrainType;
+  getTerrainAt(x: number, y: number, roomName: RoomNameOrString): TerrainType;
 
   /**
    * CPU cost: LOW
@@ -1076,7 +1119,7 @@ declare namespace Game.map {
    * @param pos The position object.
    * @returns One of the following string values: plain, swamp, wall
    */
-  export function getTerrainAt(pos: RoomPosition): TerrainType;
+  getTerrainAt(pos: RoomPosition): TerrainType;
 
   /**
    * CPU cost: AVERAGE
@@ -1086,31 +1129,33 @@ declare namespace Game.map {
    * @param roomName The room name.
    * @returns A boolean value.
    */
-  export function isRoomProtected(roomName: string): boolean;
+  isRoomProtected(roomName: RoomNameOrString): boolean;
 
 }
 
 interface RoomExits {
 
+  readonly [direction: number]: RoomName | undefined;
+
   /**
    * Direction TOP
    */
-    '1': string | null;
+  readonly 1: RoomName | undefined;
 
   /**
    * Direction RIGHT
    */
-    '3': string | null;
+  readonly 3: RoomName | undefined;
 
   /**
    * Direction BOTTOM
    */
-    '5': string | null;
+  readonly 5: RoomName | undefined;
 
   /**
    * Direction LEFT
    */
-    '7': string | null;
+  readonly 7: RoomName | undefined;
 
 }
 
@@ -1121,36 +1166,31 @@ interface FindRouteOpts {
    * can use this to do things like prioritize your own rooms, or avoid some rooms. You can return a floating point cost or Infinity to
    * block the room.
    */
-  routeCallback: (roomName: string, fromRoomName: string) => number;
+  routeCallback: (roomName: RoomName, fromRoomName: RoomName) => number;
 
 }
 
 interface RoomPathStep {
 
-  exit: FindType<RoomPosition>;
+  readonly exit: FindType<RoomPosition>;
 
-  room: string;
+  readonly room: RoomName;
 
 }
-/**
- * A global object representing world map. Use it to navigate between rooms. The object is accessible via Game.map property.
- */
-declare namespace Game.market {
+interface Market {
 
 }
 declare const Memory: Memory;
 
 interface Memory {
 
-  [name: string]: any;
+  creeps: {[creepName: string]: CreepMemory};
 
-  creeps: {[name: string]: CreepMemory};
+  flags: {[flagName: string]: FlagMemory};
 
-  flags: {[name: string]: FlagMemory};
+  rooms: {[roomName: string]: RoomMemory};
 
-  rooms: {[name: string]: RoomMemory};
-
-  spawns: {[name: string]: SpawnMemory};
+  spawns: {[spawnName: string]: SpawnMemory};
 
 }
 
@@ -1165,96 +1205,80 @@ interface RoomMemory {
 
 interface SpawnMemory {
 }
-declare const Mineral: MineralConstructor;
-
-interface MineralConstructor {
-  prototype: Mineral;
-}
-
 /**
  * A mineral deposit. Can be harvested by creeps with a WORK body part using the extractor structure.
  */
-interface Mineral extends RoomObject {
+declare class Mineral extends RoomObject {
 
   /**
    * The remaining amount of resources.
    */
-  mineralAmount: number;
+  public readonly mineralAmount: number;
 
   /**
    * The resource type, one of the RESOURCE_* constants.
    */
-  mineralType: ResourceType;
+  public readonly mineralType: ResourceType;
 
   /**
    * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
    */
-  id: string;
+  public readonly id: MineralId;
 
   /**
    * The remaining time after which the deposit will be refilled.
    */
-  ticksToRegeneration: number;
+  public readonly ticksToRegeneration: number;
 
 }
-declare const Nuke: NukeConstructor;
-
-interface NukeConstructor {
-  prototype: Nuke;
-}
-
 /**
  * A nuke landing position. This object cannot be removed or modified. You can find incoming nukes in the room using the FIND_NUKES
  * constant.
  */
-interface Nuke extends RoomObject {
+declare class Nuke extends RoomObject {
 
   /**
    * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
    */
-  id: string;
+  public readonly id: NukeId;
 
   /**
    * The name of the room where this nuke has been launched from.
    */
-  launchRoomName: string;
+  public readonly launchRoomName: RoomName;
 
   /**
    * The remaining landing time.
    */
-  timeToLand: number;
+  public readonly timeToLand: number;
 
 }
-declare const OwnedStructure: OwnedStructureConstructor;
-
-interface OwnedStructureConstructor {
-  prototype: OwnedStructure;
-}
-
 /**
  * The base prototype for a structure that has an owner. Such structures can be found using FIND_MY_STRUCTURES and FIND_HOSTILE_STRUCTURES
  * constants.
  */
-interface OwnedStructure extends Structure {
+declare abstract class OwnedStructure<T> extends Structure<T> {
 
   /**
    * Whether this is your own structure. Walls and roads don't have this property as they are considered neutral
    * structures.
    */
-  my: boolean;
+  public readonly my: boolean;
 
   /**
    * An object with the structure’s owner info (if present) containing the following properties: username
    */
-  owner: Owner;
+  public readonly owner: Owner;
 
 }
+declare const PathFinder: PathFinder;
+
 /**
  * Contains powerful methods for pathfinding in the game world. Support exists for custom navigation costs and paths which span multiple
  * rooms. Additionally PathFinder can search for paths through rooms you can't see, although you won't be able to detect any dynamic
  * obstacles like creeps or buildings.
  */
-declare namespace PathFinder {
+interface PathFinder {
 
   /**
    * Container for custom navigation cost data. By default PathFinder will only consider terrain data (plain, swamp, wall) — if you need to
@@ -1263,7 +1287,7 @@ declare namespace PathFinder {
    * cost. You should avoid using large values in your CostMatrix and terrain cost flags. For example, running PathFinder.search with {
    * plainCost: 1, swampCost: 5 } is faster than running it with {plainCost: 2, swampCost: 10 } even though your paths will be the same.
    */
-  export const CostMatrix: CostMatrixConstructor;
+  readonly CostMatrix: typeof CostMatrix;
 
   /**
    * CPU cost: HIGH
@@ -1275,9 +1299,7 @@ declare namespace PathFinder {
    *     returned. A goal is either a RoomPosition or an object as defined below.
    * @param opts An object containing additional pathfinding flags.
    */
-  export function search(origin: RoomPosition,
-                         goal: RoomPosition | SearchGoal | (RoomPosition | SearchGoal)[],
-                         opts ?: PathFinderOpts): SearchResult;
+  search(origin: RoomPosition, goal: RoomPosition | SearchGoal | (RoomPosition | SearchGoal)[], opts ?: PathFinderOpts): SearchResult;
 
   /**
    * CPU cost: NONE
@@ -1287,7 +1309,7 @@ declare namespace PathFinder {
    *
    * @param isEnabled Whether to activate the new pathfinder or deactivate.
    */
-  export function use(isEnabled: boolean): void;
+  use(isEnabled: boolean): void;
 
 }
 
@@ -1314,12 +1336,12 @@ interface SearchResult {
   /**
    * An array of RoomPosition objects.
    */
-  path: RoomPosition[];
+  readonly path: RoomPosition[];
 
   /**
    * Total number of operations performed before this path was calculated.
    */
-  ops: number;
+  readonly ops: number;
 
 }
 
@@ -1367,28 +1389,7 @@ interface PathFinderOpts {
    * you may consider caching your CostMatrix to speed up your code. Please read the CostMatrix documentation below for more information on
    * CostMatrix. If you return false from the callback the requested room will not be searched, and it won't count against maxRooms.
    */
-  roomCallback?(roomName: string): boolean | CostMatrix;
-
-}
-
-interface CostMatrixConstructor {
-
-  prototype: CostMatrix;
-
-  /**
-   * Creates a new CostMatrix containing 0's for all positions.
-   */
-  new(): CostMatrix;
-
-  /**
-   * CPU cost: LOW
-   *
-   * Static method which deserializes a new CostMatrix using the return value of serialize.
-   *
-   * @param val Whatever serialize returned
-   * @returns new CostMatrix instance.
-   */
-  deserialize(val: SerializedCostMatrix): CostMatrix;
+  roomCallback?(roomName: RoomName): boolean | CostMatrix;
 
 }
 
@@ -1399,7 +1400,22 @@ interface CostMatrixConstructor {
  * You should avoid using large values in your CostMatrix and terrain cost flags. For example, running PathFinder.search with { plainCost:
  * 1, swampCost: 5 } is faster than running it with {plainCost: 2, swampCost: 10 } even though your paths will be the same.
  */
-interface CostMatrix {
+declare class CostMatrix {
+
+  /**
+   * CPU cost: LOW
+   *
+   * Static method which deserializes a new CostMatrix using the return value of serialize.
+   *
+   * @param val Whatever serialize returned
+   * @returns new CostMatrix instance.
+   */
+  public static deserialize(val: SerializedCostMatrix): CostMatrix;
+
+  /**
+   * Creates a new CostMatrix containing 0's for all positions.
+   */
+  constructor();
 
   /**
    * CPU cost: NONE
@@ -1411,7 +1427,7 @@ interface CostMatrix {
    * @param cost Cost of this position. Must be a whole number. A cost of 0 will use the terrain cost for that tile. A cost greater than or
    *     equal to 255 will be treated as unwalkable.
    */
-  set(x: number, y: number, cost: number): void;
+  public set(x: number, y: number, cost: number): void;
 
   /**
    * CPU cost: NONE
@@ -1422,71 +1438,75 @@ interface CostMatrix {
    * @param y Y position in the room.
    * @returns cost
    */
-  get(x: number, y: number): number;
+  public get(x: number, y: number): number;
 
   /**
    * CPU cost: LOW
    *
    * Copy this CostMatrix into a new CostMatrix with the same data.
    */
-  clone(): CostMatrix;
+  public clone(): CostMatrix;
 
   /**
    * CPU cost: LOW
    *
    * @returns a compact representation of this CostMatrix which can be stored via JSON.stringify.
    */
-  serialize(): SerializedCostMatrix;
+  public serialize(): SerializedCostMatrix;
 
 }
 
 type SerializedCostMatrix = number[];
+declare const RawMemory: RawMemory;
+
 /**
  * RawMemory object allows to implement your own memory stringifier instead of built-in serializer based on JSON.stringify.
  */
-declare namespace RawMemory {
+interface RawMemory {
 
   /**
    * Get a raw string representation of the Memory object.
    *
    * @returns Returns a string value.
    */
-  export function get(): string;
+  get(): SerializedMemory;
 
   /**
    * Set new memory value.
    * @param value New memory value as a string.
    */
-  export function set(value: string): void;
+  set(value: SerializedMemory): void;
 
 }
+
+type SerializedMemory = string;
 /**
  * A dropped piece of resource. It will decay after a while if not picked up. Dropped resource pile decays for ceil(amount/1000) units per
  * tick.
  */
-interface Resource extends RoomObject {
+declare class Resource extends RoomObject {
 
   /**
    * The amount of resource units containing.
    */
-  amount: number;
+  public readonly amount: number;
 
   /**
    * A unique object identificator. You can use `Game.getObjectById` method to retrieve an object instance by its `id`.
    */
-  id: string;
+  public readonly id: ResourceId;
 
   /**
    * One of the `RESOURCE_*` constants.
    */
-  resourceType: ResourceType;
+  public readonly resourceType: ResourceType;
 
 }
-declare const Room: RoomConstructor;
-
-interface RoomConstructor {
-
-  prototype: Room;
+/**
+ * An object representing the room in which your units and structures are in. It can be used to look around, find paths, etc. Every object
+ * in the room contains its linked Room instance in the room property.
+ */
+declare class Room {
 
   /**
    * CPU cost: LOW
@@ -1496,7 +1516,7 @@ interface RoomConstructor {
    * @param path A path array retrieved from Room.findPath.
    * @returns A serialized string form of the given path.
    */
-  serializePath(path: PathStep[]): SerializedPath;
+  public static serializePath(path: PathStep[]): SerializedPath;
 
   /**
    * CPU cost: LOW
@@ -1506,58 +1526,48 @@ interface RoomConstructor {
    * @param path A serialized path string.
    * @returns A path array.
    */
-  deserializePath(path: SerializedPath): PathStep[];
-
-}
-
-type SerializedPath = string;
-
-/**
- * An object representing the room in which your units and structures are in. It can be used to look around, find paths, etc. Every object
- * in the room contains its linked Room instance in the room property.
- */
-interface Room {
+  public static deserializePath(path: SerializedPath): PathStep[];
 
   /**
    * The Controller structure of this room, if present, otherwise undefined.
    */
-  controller: Controller | undefined;
+  public readonly controller: Controller | undefined;
 
   /**
    * Total amount of energy available in all spawns and extensions in the room.
    */
-  energyAvailable: number;
+  public readonly energyAvailable: number;
 
   /**
    * Total amount of energyCapacity of all spawns and extensions in the room.
    */
-  energyCapacityAvailable: number;
+  public energyCapacityAvailable: number;
 
   /**
    * A shorthand to Memory.rooms[room.name]. You can use it for quick access the room’s specific memory data object.
    */
-  memory: RoomMemory;
+  public memory: RoomMemory;
 
   /**
    * One of the following constants:
    * MODE_SIMULATION, MODE_SURVIVAL, MODE_WORLD, MODE_ARENA
    */
-  mode: RoomModes;
+  public readonly mode: RoomModes;
 
   /**
    * The name of the room.
    */
-  name: string;
+  public readonly name: RoomName;
 
   /**
    * The Storage structure of this room, if present, otherwise undefined.
    */
-  storage: StructureStorage;
+  public readonly storage: StructureStorage;
 
   /**
    * The Terminal structure of this room, if present, otherwise undefined.
    */
-  terminal: Terminal;
+  public readonly terminal: Terminal;
 
   /**
    * CPU cost: CONST
@@ -1569,7 +1579,7 @@ interface Room {
    * @param structureType One of the STRUCTURE_* constants.
    * @returns Result Code: OK, ERR_INVALID_TARGET, ERR_FULL, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
    */
-  createConstructionSite(x: number, y: number, structureType: StructureType<any>): ResponseCode;
+  public createConstructionSite(x: number, y: number, structureType: StructureType<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -1580,7 +1590,7 @@ interface Room {
    * @param structureType One of the STRUCTURE_* constants.
    * @returns Result Code: OK, ERR_INVALID_TARGET, ERR_FULL, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
    */
-  createConstructionSite(pos: RoomPosition | RoomObject, structureType: StructureType<any>): ResponseCode;
+  public createConstructionSite(pos: RoomPosition | RoomObject, structureType: StructureType<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -1595,7 +1605,7 @@ interface Room {
    * @param secondaryColor The secondary color of a new flag. Should be one of the COLOR_* constants. The default value is equal to color.
    * @returns Result Code: OK, ERR_NAME_EXISTS, ERR_INVALID_ARGS
    */
-  createFlag(x: number, y: number, name?: string, color?: Color, secondaryColor?: Color): ResponseCode;
+  public createFlag(x: number, y: number, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -1609,7 +1619,7 @@ interface Room {
    * @param secondaryColor The secondary color of a new flag. Should be one of the COLOR_* constants. The default value is equal to color.
    * @returns Result Code: OK, ERR_NAME_EXISTS, ERR_INVALID_ARGS
    */
-  createFlag(pos: RoomPosition | RoomObject, name?: string, color?: Color, secondaryColor?: Color): ResponseCode;
+  public createFlag(pos: RoomPosition | RoomObject, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode;
 
   /**
    * CPU cost: AVERAGE
@@ -1620,7 +1630,7 @@ interface Room {
    * @param opts An object with additional options
    * @returns An array with the objects found.
    */
-  find<T extends RoomObject | RoomPosition>(type: FindType<T>, opts?: FilterOptions<T>): T[];
+  public find<T extends RoomObject | RoomPosition>(type: FindType<T>, opts?: FilterOptions<T>): T[];
 
   /**
    * CPU cost: HIGH
@@ -1632,7 +1642,7 @@ interface Room {
    * @returns The room direction constant, one of the following: FIND_EXIT_TOP, FIND_EXIT_RIGHT, FIND_EXIT_BOTTOM, FIND_EXIT_LEFT
    * Or one of the following error codes: ERR_NO_PATH, ERR_INVALID_ARGS
    */
-  findExitTo(room: string | Room): FindType<RoomPosition> | ResponseCode;
+  public findExitTo(room: RoomNameOrString | Room): FindType<RoomPosition> | ResponseCode;
 
   /**
    * CPU cost: HIGH
@@ -1644,7 +1654,7 @@ interface Room {
    * @param opts (optional) An object containing additonal pathfinding flags
    * @returns An array with path steps
    */
-  findPath(fromPos: RoomPosition, toPos: RoomPosition, opts?: FindPathOpts): PathStep[];
+  public findPath(fromPos: RoomPosition, toPos: RoomPosition, opts?: FindPathOpts): PathStep[];
 
   /**
    * CPU cost: LOW
@@ -1655,7 +1665,7 @@ interface Room {
    * @param y The Y position.
    * @returns A RoomPosition object or null if it cannot be obtained.
    */
-  getPositionAt(x: number, y: number): RoomPosition | null;
+  public getPositionAt(x: number, y: number): RoomPosition | null;
 
   /**
    * CPU cost: AVERAGE
@@ -1666,7 +1676,7 @@ interface Room {
    * @param y The Y position.
    * @returns An array with objects at the specified position
    */
-  lookAt(x: number, y: number): LookAtResult[];
+  public lookAt(x: number, y: number): LookAtResult[];
 
   /**
    * CPU cost: AVERAGE
@@ -1676,7 +1686,7 @@ interface Room {
    * @param target Can be a RoomPosition object or any object containing RoomPosition.
    * @returns An array with objects at the specified position
    */
-  lookAt(target: RoomPosition | RoomObject): LookAtResult[];
+  public lookAt(target: RoomPosition | RoomObject): LookAtResult[];
 
   /**
    * CPU cost: AVERAGE
@@ -1690,7 +1700,8 @@ interface Room {
    * @param asArray Set to true if you want to get the result as a plain array.
    * @returns An object with all the objects in the specified area
    */
-  lookAtArea(top: number, left: number, bottom: number, right: number, asArray?: boolean): LookAtResultMatrix | LookAtResultWithPos[];
+  public lookAtArea(top: number, left: number, bottom: number, right: number,
+                    asArray?: boolean): LookAtResultMatrix | LookAtResultWithPos[];
 
   /**
    * CPU cost: LOW
@@ -1702,7 +1713,7 @@ interface Room {
    * @param y The Y position.
    * @returns An array of objects of the given type at the specified position if found.
    */
-  lookForAt<T>(type: LookType<T>, x: number, y: number): T[] | null;
+  public lookForAt<T>(type: LookType<T>, x: number, y: number): T[] | null;
 
   /**
    * CPU cost: LOW
@@ -1713,7 +1724,7 @@ interface Room {
    * @param target Can be a RoomPosition object or any object containing RoomPosition.
    * @returns An array of objects of the given type at the specified position if found.
    */
-  lookForAt<T>(type: LookType<T>, target: RoomPosition | RoomObject): T[] | null;
+  public lookForAt<T>(type: LookType<T>, target: RoomPosition | RoomObject): T[] | null;
 
   /**
    * CPU cost: LOW
@@ -1729,37 +1740,47 @@ interface Room {
    * @param asArray Set to true if you want to get the result as a plain array.
    * @returns An object with all the objects of the given type in the specified area
    */
-  lookForAtArea(type: LookType<any>, top: number, left: number, bottom: number, right: number, asArray?: boolean): LookAtResultMatrix |
-    LookAtResultWithPos[];
+  public lookForAtArea(type: LookType<any>, top: number, left: number, bottom: number, right: number,
+                       asArray?: boolean): LookAtResultMatrix | LookAtResultWithPos[];
 
 }
-declare const RoomObject: RoomObjectConstructor;
-
-interface RoomObjectConstructor {
-  prototype: RoomObject;
-}
-
 /**
  * Any object with a position in a room. Almost all game objects prototypes are derived from RoomObject.
  */
-interface RoomObject {
+declare abstract class RoomObject {
 
   /**
    * An object representing the position of this object in the room.
    */
-  pos: RoomPosition;
+  public readonly pos: RoomPosition;
 
   /**
    * The link to the Room object. May be undefined in case if an object is a flag or a construction site and is placed in a room that is
    * not visible to you.
    */
-  room: Room | undefined;
+  public readonly room: Room | undefined;
 
 }
-declare const RoomPosition: RoomPositionConstructor;
+/**
+ * An object representing the specified position in the room. Every object in the room contains RoomPosition as the pos property. The
+ * position object of a custom location can be obtained using the Room.getPositionAt() method or using the constructor.
+ */
+declare class RoomPosition {
 
-interface RoomPositionConstructor {
-  prototype: RoomPosition;
+  /**
+   * The name of the room.
+   */
+  public readonly roomName: RoomName;
+
+  /**
+   * X position in the room.
+   */
+  public readonly x: number;
+
+  /**
+   * Y position in the room.
+   */
+  public readonly y: number;
 
   /**
    * You can create new RoomPosition object using its constructor.
@@ -1768,30 +1789,7 @@ interface RoomPositionConstructor {
    * @param y Y position in the room.
    * @param roomName The room name.
    */
-  new(x: number, y: number, roomName: string): RoomPosition;
-
-}
-
-/**
- * An object representing the specified position in the room. Every object in the room contains RoomPosition as the pos property. The
- * position object of a custom location can be obtained using the Room.getPositionAt() method or using the constructor.
- */
-interface RoomPosition {
-
-  /**
-   * The name of the room.
-   */
-  roomName: string;
-
-  /**
-   * X position in the room.
-   */
-  x: number;
-
-  /**
-   * Y position in the room.
-   */
-  y: number;
+  constructor(x: number, y: number, roomName: RoomNameOrString);
 
   /**
    * CPU cost: CONST
@@ -1801,7 +1799,7 @@ interface RoomPosition {
    * @param structureType One of the STRUCTURE_* constants.
    * @returns Result Code: OK, ERR_INVALID_TARGET, ERR_FULL, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
    */
-  createConstructionSite(structureType: StructureType<any>): ResponseCode;
+  public createConstructionSite(structureType: StructureType<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -1814,7 +1812,7 @@ interface RoomPosition {
    * @param secondaryColor The secondary color of a new flag. Should be one of the COLOR_* constants. The default value is equal to color.
    * @returns Result Code: OK, ERR_NAME_EXISTS, ERR_INVALID_ARGS
    */
-  createFlag(name?: string, color?: Color, secondaryColor?: Color): ResponseCode;
+  public createFlag(name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode;
 
   /**
    * CPU cost: HIGH
@@ -1825,7 +1823,7 @@ interface RoomPosition {
    * @param opts An object containing pathfinding options (see Room.findPath), or one of the following: filter, algorithm
    * @returns The closest object if found, null otherwise.
    */
-  findClosestByPath<T extends RoomObject | RoomPosition>(type: FindType<T>, opts?: FindClosestPathOpts<T>): T | null;
+  public findClosestByPath<T extends RoomObject | RoomPosition>(type: FindType<T>, opts?: FindClosestPathOpts<T>): T | null;
 
   /**
    * CPU cost: HIGH
@@ -1836,7 +1834,7 @@ interface RoomPosition {
    * @param opts An object containing pathfinding options (see Room.findPath), or one of the following: filter, algorithm
    * @returns The closest object if found, null otherwise.
    */
-  findClosestByPath<T extends RoomObject | RoomPosition>(objects: T[] | RoomPosition[], opts?: FindClosestPathOpts<T>): T | null;
+  public findClosestByPath<T extends RoomObject | RoomPosition>(objects: T[] | RoomPosition[], opts?: FindClosestPathOpts<T>): T | null;
 
   /**
    * CPU cost: AVERAGE
@@ -1847,7 +1845,7 @@ interface RoomPosition {
    * @param opts
    * @returns The closest object if found, null otherwise.
    */
-  findClosestByRange<T extends RoomObject | RoomPosition>(type: FindType<T>, opts?: FilterOptions<T>): T | null;
+  public findClosestByRange<T extends RoomObject | RoomPosition>(type: FindType<T>, opts?: FilterOptions<T>): T | null;
 
   /**
    * CPU cost: AVERAGE
@@ -1858,7 +1856,7 @@ interface RoomPosition {
    * @param opts
    * @returns The closest object if found, null otherwise.
    */
-  findClosestByRange<T extends RoomObject | RoomPosition>(objects: T[], opts?: FilterOptions<T>): T | null;
+  public findClosestByRange<T extends RoomObject | RoomPosition>(objects: T[], opts?: FilterOptions<T>): T | null;
 
   /**
    * CPU cost: AVERAGE
@@ -1870,7 +1868,7 @@ interface RoomPosition {
    * @param opts See Room.find.
    * @return An array with the objects found.
    */
-  findInRange<T extends RoomObject | RoomPosition>(type: FindType<T>, range: number, opts?: FilterOptions<T>): T[];
+  public findInRange<T extends RoomObject | RoomPosition>(type: FindType<T>, range: number, opts?: FilterOptions<T>): T[];
 
   /**
    * CPU cost: AVERAGE
@@ -1882,7 +1880,7 @@ interface RoomPosition {
    * @param opts See Room.find.
    * @return An array with the objects found.
    */
-  findInRange<T extends RoomObject | RoomPosition>(objects: T[] | RoomPosition[], range: number, opts?: FilterOptions<T>): T[];
+  public findInRange<T extends RoomObject | RoomPosition>(objects: T[] | RoomPosition[], range: number, opts?: FilterOptions<T>): T[];
 
   /**
    * CPU cost: HIGH
@@ -1895,7 +1893,7 @@ interface RoomPosition {
    * @param opts An object containing pathfinding options flags (see Room.findPath for more details).
    * @returns An array with path steps
    */
-  findPathTo(x: number, y: number, opts?: FindPathOpts): PathStep[];
+  public findPathTo(x: number, y: number, opts?: FindPathOpts): PathStep[];
 
   /**
    * CPU cost: HIGH
@@ -1907,7 +1905,7 @@ interface RoomPosition {
    * @param opts An object containing pathfinding options flags (see Room.findPath for more details).
    * @returns An array with path steps
    */
-  findPathTo(target: RoomPosition | RoomObject, opts?: FindPathOpts): PathStep[];
+  public findPathTo(target: RoomPosition | RoomObject, opts?: FindPathOpts): PathStep[];
 
   /**
    * CPU cost: LOW
@@ -1918,7 +1916,7 @@ interface RoomPosition {
    * @param y Y position in the room.
    * @returns A number representing one of the direction constants.
    */
-  getDirectionTo(x: number, y: number): Direction;
+  public getDirectionTo(x: number, y: number): Direction;
 
   /**
    * CPU cost: LOW
@@ -1928,7 +1926,7 @@ interface RoomPosition {
    * @param target Can be a RoomPosition object or any object containing RoomPosition.
    * @returns A number representing one of the direction constants.
    */
-  getDirectionTo(target: RoomPosition | RoomObject): Direction;
+  public getDirectionTo(target: RoomPosition | RoomObject): Direction;
 
   /**
    * CPU cost: LOW
@@ -1939,7 +1937,7 @@ interface RoomPosition {
    * @param y Y position in the room.
    * @returns A number of squares to the given position.
    */
-  getRangeTo(x: number, y: number): number;
+  public getRangeTo(x: number, y: number): number;
 
   /**
    * CPU cost: LOW
@@ -1949,7 +1947,7 @@ interface RoomPosition {
    * @param target Can be a RoomPosition object or any object containing RoomPosition.
    * @returns A number of squares to the given position.
    */
-  getRangeTo(target: RoomPosition | RoomObject): number;
+  public getRangeTo(target: RoomPosition | RoomObject): number;
 
   /**
    * CPU cost: LOW
@@ -1961,7 +1959,7 @@ interface RoomPosition {
    * @param range The range distance.
    * @returns A boolean value.
    */
-  inRangeTo(x: number, y: number, range: number): boolean;
+  public inRangeTo(x: number, y: number, range: number): boolean;
 
   /**
    * CPU cost: LOW
@@ -1972,7 +1970,7 @@ interface RoomPosition {
    * @param range The range distance.
    * @returns A boolean value.
    */
-  inRangeTo(toPos: RoomPosition | RoomObject, range: number): boolean;
+  public inRangeTo(toPos: RoomPosition | RoomObject, range: number): boolean;
 
   /**
    * CPU cost: LOW
@@ -1983,7 +1981,7 @@ interface RoomPosition {
    * @param y Y position in the room.
    * @returns A boolean value.
    */
-  isEqualTo(x: number, y: number): boolean;
+  public isEqualTo(x: number, y: number): boolean;
 
   /**
    * CPU cost: LOW
@@ -1993,7 +1991,7 @@ interface RoomPosition {
    * @param target Can be a RoomPosition object or any object containing RoomPosition.
    * @returns A boolean value.
    */
-  isEqualTo(target: RoomPosition | RoomObject): boolean;
+  public isEqualTo(target: RoomPosition | RoomObject): boolean;
 
   /**
    * CPU cost: LOW
@@ -2004,7 +2002,7 @@ interface RoomPosition {
    * @param y Y position in the room.
    * @returns A boolean value.
    */
-  isNearTo(x: number, y: number): boolean;
+  public isNearTo(x: number, y: number): boolean;
 
   /**
    * CPU cost: LOW
@@ -2014,7 +2012,7 @@ interface RoomPosition {
    * @param target Can be a RoomPosition object or any object containing RoomPosition.
    * @returns A boolean value.
    */
-  isNearTo(target: RoomPosition | RoomObject): boolean;
+  public isNearTo(target: RoomPosition | RoomObject): boolean;
 
   /**
    * CPU cost: AVERAGE
@@ -2023,7 +2021,7 @@ interface RoomPosition {
    *
    * @returns An array with objects at the specified position
    */
-  look(): LookAtResult[];
+  public look(): LookAtResult[];
 
   /**
    * CPU cost: LOW
@@ -2033,7 +2031,7 @@ interface RoomPosition {
    * @param type One of the LOOK_* constants.
    * @returns An array of objects of the given type at the specified position if found.
    */
-  lookFor<T extends RoomObject>(type: LookType<T>): T[];
+  public lookFor<T extends RoomObject>(type: LookType<T>): T[];
 
 }
 
@@ -2054,14 +2052,14 @@ interface FilterOptions<T> {
   /**
    * Only the objects which pass the filter using the Lodash.filter method will be used.
    */
-  filter?: ListIterator<T, boolean> | string; // TODO: support maps
+  filter?: ListIterator<T> | string | {};
 
 }
 
 // from lodash
 
-interface ListIterator<T, TResult> {
-  (value: T, index: number, collection: List<T>): TResult;
+interface ListIterator<T> {
+  (value: T, index: number, collection: List<T>): boolean;
 }
 
 interface List<T> {
@@ -2071,59 +2069,53 @@ interface List<T> {
 /**
  * An energy source object. Can be harvested by creeps with a WORK body part.
  */
-interface Source extends RoomObject {
+declare class Source extends RoomObject {
 
   /**
    * The remaining amount of energy.
    */
-  energy: number;
+  public readonly energy: number;
 
   /**
    * The total amount of energy in the source.
    */
-  energyCapacity: number;
+  public readonly energyCapacity: number;
 
   /**
    * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
    */
-  id: string;
+  public readonly id: SourceId;
 
   /**
    * The remaining time after which the source will be refilled.
    */
-  ticksToRegeneration: number;
+  public readonly ticksToRegeneration: number;
 
 }
-declare const Structure: StructureConstructor;
-
-interface StructureConstructor {
-  prototype: Structure;
-}
-
 /**
  * The base prototype object of all structures.
  */
-interface Structure extends RoomObject {
+declare abstract class Structure<T> extends RoomObject {
 
   /**
    * The current amount of hit points of the structure.
    */
-  hits: number;
+  public readonly hits: number;
 
   /**
    * The total amount of hit points of the structure.
    */
-  hitsMax: number;
+  public readonly hitsMax: number;
 
   /**
    * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
    */
-  id: string;
+  public readonly id: StructureId<T>;
 
   /**
    * One of the STRUCTURE_* constants.
    */
-  structureType: StructureType<any>;
+  public readonly structureType: StructureType<T>;
 
   /**
    * CPU cost: CONST
@@ -2132,7 +2124,7 @@ interface Structure extends RoomObject {
    *
    * @returns Return code: OK, ERR_NOT_OWNER
    */
-  destroy(): ResponseCode;
+  public destroy(): ResponseCode;
 
   /**
    * CPU cost: AVERAGE
@@ -2142,7 +2134,7 @@ interface Structure extends RoomObject {
    *
    * @returns A boolean value.
    */
-  isActive(): boolean;
+  public isActive(): boolean;
 
   /**
    * CPU cost: CONST
@@ -2152,34 +2144,28 @@ interface Structure extends RoomObject {
    * @param enabled Whether to enable notification or disable.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_INVALID_ARGS
    */
-  notifyWhenAttacked(enabled: boolean): ResponseCode;
+  public notifyWhenAttacked(enabled: boolean): ResponseCode;
 
 }
-declare const StructureContainer: StructureContainerConstructor;
-
-interface StructureContainerConstructor {
-  prototype: StructureContainer;
-}
-
 type Container = StructureContainer;
 
 /**
  * A small container that can be used to store resources. This is a walkable structure. All dropped resources automatically goes to the
  * container at the same tile.
  */
-interface StructureContainer extends Structure {
+declare class StructureContainer extends Structure<Container> {
 
   /**
    * An object with the structure contents. Each object key is one of the RESOURCE_* constants, values are resources amounts.
    * RESOURCE_ENERGY is always defined and equals to 0 when empty, other resources are undefined when empty. You can use lodash.sum to get
    * the total amount of contents.
    */
-  store: StoreDefinition;
+  public readonly store: StoreContents;
 
   /**
    * The total amount of resources the structure can contain.
    */
-  storeCapacity: number;
+  public readonly storeCapacity: number;
 
   /**
    * CPU cost: CONST
@@ -2193,15 +2179,9 @@ interface StructureContainer extends Structure {
    * @param amount The amount of resources to be transferred. If omitted, all the available amount is used.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE, ERR_INVALID_ARGS
    */
-  transfer(target: Creep, resourceType: ResourceType, amount?: number): ResponseCode;
+  public transfer(target: Creep, resourceType: ResourceType, amount?: number): ResponseCode;
 
 }
-declare const StructureController: StructureControllerConstructor;
-
-interface StructureControllerConstructor {
-  prototype: StructureController;
-}
-
 type Controller = StructureController;
 
 /**
@@ -2209,63 +2189,80 @@ type Controller = StructureController;
  * cannot be damaged or destroyed. It can be addressed by `Room.controller`
  * property.
  */
-interface StructureController extends OwnedStructure {
+declare class StructureController extends OwnedStructure<Controller> {
 
   /**
    * Current controller level, from 0 to 8.
    */
-  level: number;
+  public readonly level: number;
 
   /**
    * The current progress of upgrading the controller to the next level.
    */
-  progress: number;
+  public readonly progress: number;
 
   /**
    * The progress needed to reach the next level.
    */
-  progressTotal: number;
+  public readonly progressTotal: number;
 
   /**
    * An object with the controller reservation info if present: username, ticksToEnd
    */
-  // reservation: ReservationDefinition;
+  public readonly reservation: Reservation;
 
   /**
    * The amount of game ticks when this controller will lose one level. This timer can be reset by using
    * Creep.upgradeController.
    */
-  ticksToDowngrade: number;
+  public readonly ticksToDowngrade: number;
 
   /**
-   * Make your claimed controller neutral again.
+   * The amount of game ticks while this controller cannot be upgraded due to attack.
    */
-  unclaim(): number;
+  public readonly upgradeBlocked: number;
+
+  /**
+   * CPU cost: CONST
+   *
+   * Make your claimed controller neutral again.
+   *
+   * @returns Return code: OK, ERR_NOT_OWNER
+   */
+  public unclaim(): ResponseCode;
 
 }
-declare const StructureExtension: StructureExtensionConstructor;
 
-interface StructureExtensionConstructor {
-  prototype: StructureExtension;
+interface Reservation {
+
+  /**
+   * The name of a player who reserved this controller.
+   */
+  readonly username: string;
+
+  /**
+   * The amount of game ticks when the reservation will end.
+   */
+  readonly ticksToEnd: number;
+
 }
-
 type Extension = StructureExtension;
 
 /**
  * Contains energy which can be spent on spawning bigger creeps. Extensions can be placed anywhere in the room, any spawns will be able to
  * use them regardless of distance.
  */
-interface StructureExtension extends OwnedStructure {
+declare class StructureExtension extends OwnedStructure<Extension> {
 
   /**
    * The amount of energy containing in the extension.
    */
-  energy: number;
+  public readonly energy: number;
 
   /**
    * The total amount of energy the extension can contain.
    */
-  energyCapacity: number;
+  public readonly energyCapacity: number;
 
   /**
    * CPU cost: CONST
@@ -2278,85 +2275,67 @@ interface StructureExtension extends OwnedStructure {
    * @param amount The amount of resources to be transferred. If omitted, all the available amount is used.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE
    */
-  transferEnergy(target: Creep, amount?: number): ResponseCode;
+  public transferEnergy(target: Creep, amount?: number): ResponseCode;
 
 }
-declare const StructureExtractor: StructureExtractorConstructor;
-
-interface StructureExtractorConstructor {
-  prototype: StructureExtractor;
-}
-
 type Extractor = StructureExtractor;
 
 /**
  * Allows to harvest mineral deposits.
  */
-interface StructureExtractor extends OwnedStructure {
+declare class StructureExtractor extends OwnedStructure<Extractor> {
 
 }
-declare const StructureKeeperLair: StructureKeeperLairConstructor;
-
-interface StructureKeeperLairConstructor {
-  prototype: StructureKeeperLair;
-}
-
 type KeeperLair = StructureKeeperLair;
 
 /**
  * Non-player structure. Spawns NPC Source Keepers that guards energy sources and minerals in some rooms. This structure cannot be
  * destroyed.
  */
-interface StructureKeeperLair extends OwnedStructure {
+declare class StructureKeeperLair extends OwnedStructure<KeeperLair> {
 
   /**
    * Time to spawning of the next Source Keeper.
    */
-  ticksToSpawn: number;
+  public readonly ticksToSpawn: number;
 
 }
-declare const StructureLab: StructureLabConstructor;
-
-interface StructureLabConstructor {
-  prototype: StructureLab;
-}
-
 type Lab = StructureLab;
 
 /**
  * Produces mineral compounds from base minerals and boosts creeps.
  */
-interface StructureLab extends OwnedStructure {
+declare class StructureLab extends OwnedStructure<Lab> {
 
   /**
    * The amount of game ticks the lab has to wait until the next reaction is possible.
    */
-  cooldown: number;
+  public readonly cooldown: number;
 
   /**
    * The amount of energy containing in the lab. Energy is used for boosting creeps.
    */
-  energy: number;
+  public readonly energy: number;
 
   /**
    * The total amount of energy the lab can contain.
    */
-  energyCapacity: number;
+  public readonly energyCapacity: number;
 
   /**
    * The amount of mineral resources containing in the lab.
    */
-  mineralAmount: number;
+  public readonly mineralAmount: number;
 
   /**
    * The type of minerals containing in the lab. Labs can contain only one mineral type at the same time.
    */
-  mineralType: ResourceType;
+  public readonly mineralType: ResourceType;
 
   /**
    * The total amount of minerals the lab can contain.
    */
-  mineralCapacity: number;
+  public readonly mineralCapacity: number;
 
   /**
    * CPU cost: CONST
@@ -2370,7 +2349,7 @@ interface StructureLab extends OwnedStructure {
    *     are boosted.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_FOUND, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE
    */
-  boostCreep(creep: Creep, bodyPartsCount?: number): ResponseCode;
+  public boostCreep(creep: Creep, bodyPartsCount?: number): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -2383,7 +2362,7 @@ interface StructureLab extends OwnedStructure {
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE, ERR_INVALID_ARGS,
    *     ERR_TIRED
    */
-  runReaction(lab1: Lab, lab2: Lab): ResponseCode;
+  public runReaction(lab1: Lab, lab2: Lab): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -2397,36 +2376,30 @@ interface StructureLab extends OwnedStructure {
    * @param amount The amount of resources to be transferred. If omitted, all the available amount is used.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE, ERR_INVALID_ARGS
    */
-  transfer(target: Creep, resourceType: ResourceType, amount?: number): ResponseCode;
+  public transfer(target: Creep, resourceType: ResourceType, amount?: number): ResponseCode;
 
 }
-declare const StructureLink: StructureLinkConstructor;
-
-interface StructureLinkConstructor {
-  prototype: StructureLink;
-}
-
 type Link = StructureLink;
 
 /**
  * Remotely transfers energy to another Link in the same room.
  */
-interface StructureLink extends OwnedStructure {
+declare class StructureLink extends OwnedStructure<Link> {
 
   /**
    * The amount of game ticks the link has to wait until the next transfer is possible.
    */
-  cooldown: number;
+  public readonly cooldown: number;
 
   /**
    * The amount of energy containing in the link.
    */
-  energy: number;
+  public readonly energy: number;
 
   /**
    * The total amount of energy the link can contain.
    */
-  energyCapacity: number;
+  public readonly energyCapacity: number;
 
   /**
    * CPU cost: CONST
@@ -2438,15 +2411,9 @@ interface StructureLink extends OwnedStructure {
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_INVALID_ARGS, ERR_TIRED,
    *     ERR_RCL_NOT_ENOUGH
    */
-  transferEnergy(target: Link, amount?: number): ResponseCode;
+  public transferEnergy(target: Link, amount?: number): ResponseCode;
 
 }
-declare const StructureNuker: StructureNukerConstructor;
-
-interface StructureNukerConstructor {
-  prototype: StructureNuker;
-}
-
 type Nuker = StructureNuker;
 
 /**
@@ -2454,32 +2421,32 @@ type Nuker = StructureNuker;
  * resources. Launching creates a Nuke object at the target room position which is visible to any player until it is landed. Incoming nuke
  * cannot be moved or cancelled. Nukes cannot be launched from or to novice rooms.
  */
-interface StructureNuker extends OwnedStructure {
+declare class StructureNuker extends OwnedStructure<Nuker> {
 
   /**
    * The amount of energy contained in this structure.
    */
-  energy: number;
+  public readonly energy: number;
 
   /**
    * The total amount of energy this structure can contain.
    */
-  energyCapacity: number;
+  public readonly energyCapacity: number;
 
   /**
    * The amount of energy contained in this structure.
    */
-  ghodium: number;
+  public readonly ghodium: number;
 
   /**
    * The total amount of energy this structure can contain.
    */
-  ghodiumCapacity: number;
+  public readonly ghodiumCapacity: number;
 
   /**
    * The amount of game ticks the link has to wait until the next transfer is possible.
    */
-  cooldown: number;
+  public readonly cooldown: number;
 
   /**
    * CPU cost: CONST
@@ -2489,21 +2456,15 @@ interface StructureNuker extends OwnedStructure {
    * @param pos The target room position.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_TIRED, ERR_RCL_NOT_ENOUGH
    */
-  launchNuke(pos: RoomPosition): ResponseCode;
+  public launchNuke(pos: RoomPosition): ResponseCode;
 
 }
-declare const StructureObserver: StructureObserverConstructor;
-
-interface StructureObserverConstructor {
-  prototype: StructureObserver;
-}
-
 type Observer = StructureObserver;
 
 /**
  * Provides visibility into a distant room from your script.
  */
-interface StructureObserver extends OwnedStructure {
+declare class StructureObserver extends OwnedStructure<Observer> {
 
   /**
    * CPU cost: CONST
@@ -2514,81 +2475,69 @@ interface StructureObserver extends OwnedStructure {
    * @param roomName The name of the target room.
    * @returns Return code: OK, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
    */
-  observeRoom(roomName: string): ResponseCode;
+  public observeRoom(roomName: RoomNameOrString): ResponseCode;
 
 }
-declare const StructurePortal: StructurePortalConstructor;
-
-interface StructurePortalConstructor {
-  prototype: StructurePortal;
-}
-
 type Portal = StructurePortal;
 
 /**
  * A non-player structure. Instantly teleports your creeps to a distant room acting as a room exit tile. Portals appear randomly in the
  * central room of each sector.
  */
-interface StructurePortal extends Structure {
+declare class StructurePortal extends Structure<Portal> {
 
   /**
    * The position object in the destination room.
    */
-  destination: RoomPosition;
+  public destination: RoomPosition;
 
   /**
    * The amount of game ticks when the portal disappears, or undefined when the portal is stable.
    */
-  ticksToDecay: number | undefined;
+  public ticksToDecay: number | undefined;
 
 }
-declare const StructurePowerBank: StructurePowerBankConstructor;
-
-interface StructurePowerBankConstructor {
-  prototype: StructurePowerBank;
-}
-
 type PowerBank = StructurePowerBank;
 
 /**
  * Non-player structure. Contains power resource which can be obtained by destroying the structure. Hits the attacker creep back on each
  * attack.
  */
-interface StructurePowerBank extends OwnedStructure {
+declare class StructurePowerBank extends OwnedStructure<PowerBank> {
 
   /**
    * The amount of power containing.
    */
-  power: number;
+  public readonly power: number;
 
   /**
    * The amount of game ticks when this structure will disappear.
    */
-  ticksToDecay: number;
+  public readonly ticksToDecay: number;
 
 }
-declare const StructureRampart: StructureRampartConstructor;
-
-interface StructureRampartConstructor {
-  prototype: StructureRampart;
+declare type PowerSpawn = StructurePowerSpawn;
+/**
+ * Processes power into your account, and spawns power creeps with special unique powers (in development).
+ */
+declare class StructurePowerSpawn extends OwnedStructure<PowerSpawn> {
 }
-
 type Rampart = StructureRampart;
 
 /**
  * Blocks movement of hostile creeps, and defends your creeps and structures on the same tile. Can be used as a controllable gate.
  */
-interface StructureRampart extends OwnedStructure {
+declare class StructureRampart extends OwnedStructure<Rampart> {
 
   /**
    * If false (default), only your creeps can step on the same square. If true, any hostile creeps can pass through.
    */
-  isPublic: boolean;
+  public readonly isPublic: boolean;
 
   /**
    * The amount of game ticks when this rampart will lose some hit points.
    */
-  ticksToDecay: number;
+  public readonly ticksToDecay: number;
 
   /**
    * CPU cost: CONST
@@ -2598,67 +2547,55 @@ interface StructureRampart extends OwnedStructure {
    * @param isPublic Whether this rampart should be public or non-public
    * @returns Return code: OK, ERR_NOT_OWNER
    */
-  setPublic(isPublic: boolean): ResponseCode;
+  public setPublic(isPublic: boolean): ResponseCode;
 
 }
-declare const StructureRoad: StructureRoadConstructor;
-
-interface StructureRoadConstructor {
-  prototype: StructureRoad;
-}
-
 type Road = StructureRoad;
 
 /**
  * Decreases movement cost to 1. Using roads allows creating creeps with less MOVE body parts.
  */
-interface StructureRoad extends Structure {
+declare class StructureRoad extends Structure<Road> {
 
   /**
    * The amount of game ticks when this road will lose some hit points.
    */
-  ticksToDecay: number;
+  public readonly ticksToDecay: number;
 
 }
-declare const StructureSpawn: StructureSpawnConstructor;
-
-interface StructureSpawnConstructor {
-  prototype: StructureSpawn;
-}
-
 type Spawn = StructureSpawn;
 
 /**
  * Spawn is your colony center. This structure can create, renew, and recycle creeps. All your spawns are accessible through Game.spawns
  * hash list. Spawns auto-regenerate a little amount of energy each tick, so that you can easily recover even if all your creeps died.
  */
-interface StructureSpawn extends OwnedStructure {
+declare class StructureSpawn extends OwnedStructure<Spawn> {
 
   /**
    * The amount of energy containing in the spawn.
    */
-  energy: number;
+  public readonly energy: number;
 
   /**
    * The total amount of energy the spawn can contain
    */
-  energyCapacity: number;
+  public readonly energyCapacity: number;
 
   /**
    * A shorthand to Memory.spawns[spawn.name]. You can use it for quick access the spawn’s specific memory data object.
    */
-  memory: SpawnMemory;
+  public memory: SpawnMemory;
 
   /**
    * Spawn’s name. You choose the name upon creating a new spawn, and it cannot be changed later. This name is a hash key to access the
    * spawn via the Game.spawns object.
    */
-  name: string;
+  public readonly name: SpawnName;
 
   /**
    * If the spawn is in process of spawning a new creep, this object will contain the new creep’s information, or null otherwise.
    */
-  spawning: SpawningCreep;
+  public readonly spawning: SpawningCreep;
 
   /**
    * CPU cost: LOW
@@ -2671,7 +2608,7 @@ interface StructureSpawn extends OwnedStructure {
    *     contain another creep with the same name (hash key). If not defined, a random name will be generated.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NAME_EXISTS, ERR_BUSY, ERR_NOT_ENOUGH_ENERGY, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
    */
-  canCreateCreep(body: BodyPartType[], name?: string): ResponseCode;
+  public canCreateCreep(body: BodyPartType[], name?: CreepNameOrString): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -2685,7 +2622,7 @@ interface StructureSpawn extends OwnedStructure {
    * @param memory The memory of a new creep. If provided, it will be immediately stored into Memory.creeps[name].
    * @returns name of creep or: ERR_NOT_OWNER, ERR_NAME_EXISTS, ERR_BUSY, ERR_NOT_ENOUGH_ENERGY, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
    */
-  createCreep(body: BodyPartType[], name?: string, memory?: CreepMemory): ResponseCode | string;
+  public createCreep(body: BodyPartType[], name?: CreepNameOrString, memory?: CreepMemory): ResponseCode | CreepName;
 
   /**
    * CPU cost: CONST
@@ -2696,7 +2633,7 @@ interface StructureSpawn extends OwnedStructure {
    * @param target The target creep object.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE
    */
-  recycleCreep(target: Creep): ResponseCode;
+  public recycleCreep(target: Creep): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -2709,7 +2646,7 @@ interface StructureSpawn extends OwnedStructure {
    * @param target The target creep object.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_ENERGY, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE
    */
-  renewCreep(target: Creep): ResponseCode;
+  public renewCreep(target: Creep): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -2722,7 +2659,7 @@ interface StructureSpawn extends OwnedStructure {
    * @param amount The amount of resources to be transferred. If omitted, all the available amount is used.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE
    */
-  transferEnergy(target: Creep, amount?: number): ResponseCode;
+  public transferEnergy(target: Creep, amount?: number): ResponseCode;
 
 }
 
@@ -2731,44 +2668,38 @@ interface SpawningCreep {
   /**
    * The name of a new creep.
    */
-  name: string;
+  readonly name: string;
 
   /**
    * Time needed in total to complete the spawning.
    */
-  needTime: number;
+  readonly needTime: number;
 
   /**
    * Remaining time to go.
    */
-  remainingTime: number;
+  readonly remainingTime: number;
 
 }
-declare const StructureStorage: StructureStorageConstructor;
-
-interface StructureStorageConstructor {
-  prototype: StructureStorage;
-}
-
 // type Storage = StructureStorage;
 
 /**
  * A structure that can store huge amount of resource units. Only one structure per room is allowed that can be addressed by Room.storage
  * property.
  */
-interface StructureStorage extends OwnedStructure {
+declare class StructureStorage extends OwnedStructure<StructureStorage> {
 
   /**
    * An object with the storage contents. Each object key is one of the RESOURCE_* constants, values are resources amounts. RESOURCE_ENERGY
    * is always defined and equals to 0 when empty, other resources are undefined when empty. You can use lodash.sum to get the total amount
    * of contents.
    */
-  store: StoreDefinition;
+  public readonly store: StoreContents;
 
   /**
    * The total amount of resources the storage can contain.
    */
-  storeCapacity: number;
+  public readonly storeCapacity: number;
 
   /**
    * CPU cost: CONST
@@ -2782,15 +2713,9 @@ interface StructureStorage extends OwnedStructure {
    * @param amount The amount of resources to be transferred. If omitted, all the available amount is used.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE, ERR_INVALID_ARGS
    */
-  transfer(target: Creep, resourceType: ResourceType, amount?: number): ResponseCode;
+  public transfer(target: Creep, resourceType: ResourceType, amount?: number): ResponseCode;
 
 }
-declare const StructureTerminal: StructureTerminalConstructor;
-
-interface StructureTerminalConstructor {
-  prototype: StructureTerminal;
-}
-
 type Terminal = StructureTerminal;
 
 /**
@@ -2800,19 +2725,19 @@ type Terminal = StructureTerminal;
  * energy units. You can track your incoming and outgoing transactions using the Game.market object. Only one Terminal per room is allowed
  * that can be addressed by Room.terminal property.
  */
-interface StructureTerminal extends OwnedStructure {
+declare class StructureTerminal extends OwnedStructure<Terminal> {
 
   /**
    * An object with the storage contents. Each object key is one of the RESOURCE_* constants, values are resources amounts. RESOURCE_ENERGY
    * is always defined and equals to 0 when empty, other resources are undefined when empty. You can use lodash.sum to get the total amount
    * of contents.
    */
-  store: StoreDefinition;
+  public readonly store: StoreContents;
 
   /**
    * The total amount of resources the storage can contain.
    */
-  storeCapacity: number;
+  public readonly storeCapacity: number;
 
   /**
    * CPU cost: CONST
@@ -2826,7 +2751,7 @@ interface StructureTerminal extends OwnedStructure {
    *     characters.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_ARGS
    */
-  send(resourceType: ResourceType, amount: number, destination: string, description?: string): ResponseCode;
+  public send(resourceType: ResourceType, amount: number, destination: string, description?: string): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -2840,32 +2765,26 @@ interface StructureTerminal extends OwnedStructure {
    * @param amount The amount of resources to be transferred. If omitted, all the available amount is used.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE, ERR_INVALID_ARGS
    */
-  transfer(target: Creep, resourceType: ResourceType, amount?: number): ResponseCode;
+  public transfer(target: Creep, resourceType: ResourceType, amount?: number): ResponseCode;
 
 }
-declare const StructureTower: StructureTowerConstructor;
-
-interface StructureTowerConstructor {
-  prototype: StructureTower;
-}
-
 type Tower = StructureTower;
 
 /**
  * Remotely attacks or heals creeps, or repairs structures. Can be targeted to any object in the room. However, its effectiveness linearly
  * depends on the distance. Each action consumes energy.
  */
-interface StructureTower extends OwnedStructure {
+declare class StructureTower extends OwnedStructure<Tower> {
 
   /**
    * The amount of energy containing in this structure.
    */
-  energy: number;
+  public readonly energy: number;
 
   /**
    * The total amount of energy this structure can contain.
    */
-  energyCapacity: number;
+  public readonly energyCapacity: number;
 
   /**
    * CPU cost: CONST
@@ -2876,7 +2795,7 @@ interface StructureTower extends OwnedStructure {
    * @param target The target creep.
    * @returns Return code: OK, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_RCL_NOT_ENOUGH
    */
-  attack(target: Creep): ResponseCode;
+  public attack(target: Creep): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -2887,7 +2806,7 @@ interface StructureTower extends OwnedStructure {
    * @param target The target creep.
    * @returns Return code: OK, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_RCL_NOT_ENOUGH
    */
-  heal(target: Creep): ResponseCode;
+  public heal(target: Creep): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -2898,7 +2817,7 @@ interface StructureTower extends OwnedStructure {
    * @param target The target structure.
    * @returns Return code: OK, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_RCL_NOT_ENOUGH
    */
-  repair(target: Structure): ResponseCode;
+  public repair(target: Structure<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -2911,25 +2830,19 @@ interface StructureTower extends OwnedStructure {
    * @param amount The amount of resources to be transferred. If omitted, all the available amount is used.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE
    */
-  transferEnergy(target: Creep, amount?: number): ResponseCode;
+  public transferEnergy(target: Creep, amount?: number): ResponseCode;
 
 }
-declare const StructureWall: StructureWallConstructor;
-
-interface StructureWallConstructor {
-  prototype: StructureWall;
-}
-
 type Wall = StructureWall;
 
 /**
  * Blocks movement of all creeps.
  */
-interface StructureWall extends Structure {
+declare class StructureWall extends Structure<Wall> {
 
   /**
    * The amount of game ticks when the wall will disappear (only for automatically placed border walls at the start of the game).
    */
-  ticksToLive: number;
+  public readonly ticksToLive: number;
 
 }
