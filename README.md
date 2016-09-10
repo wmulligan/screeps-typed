@@ -32,7 +32,7 @@ declare namespace NodeJS {
 }
 
 global.TERRAIN_PLAIN = 'plain'; // tslint:disable-line
-global.TERRAIN_SPAWN = 'swamp'; // tslint:disable-line
+global.TERRAIN_SWAMP = 'swamp'; // tslint:disable-line
 global.TERRAIN_WALL = 'wall'; // tslint:disable-line
 ```
 
