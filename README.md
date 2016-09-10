@@ -26,7 +26,7 @@ Add these missing globals to your code:
 declare namespace NodeJS {
   interface Global {
     TERRAIN_PLAIN: TerrainType;
-    TERRAIN_SPAWN: TerrainType;
+    TERRAIN_SWAMP: TerrainType;
     TERRAIN_WALL: TerrainType;
   }
 }
