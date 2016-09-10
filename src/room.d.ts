@@ -1,8 +1,8 @@
-declare const Room: RoomConstructor;
-
-interface RoomConstructor {
-
-  prototype: Room;
+/**
+ * An object representing the room in which your units and structures are in. It can be used to look around, find paths, etc. Every object
+ * in the room contains its linked Room instance in the room property.
+ */
+declare class Room {
 
   /**
    * CPU cost: LOW
@@ -12,7 +12,7 @@ interface RoomConstructor {
    * @param path A path array retrieved from Room.findPath.
    * @returns A serialized string form of the given path.
    */
-  serializePath(path: PathStep[]): SerializedPath;
+  public static serializePath(path: PathStep[]): SerializedPath;
 
   /**
    * CPU cost: LOW
@@ -22,58 +22,48 @@ interface RoomConstructor {
    * @param path A serialized path string.
    * @returns A path array.
    */
-  deserializePath(path: SerializedPath): PathStep[];
-
-}
-
-type SerializedPath = string;
-
-/**
- * An object representing the room in which your units and structures are in. It can be used to look around, find paths, etc. Every object
- * in the room contains its linked Room instance in the room property.
- */
-interface Room {
+  public static deserializePath(path: SerializedPath): PathStep[];
 
   /**
    * The Controller structure of this room, if present, otherwise undefined.
    */
-  controller: Controller | undefined;
+  public readonly controller: Controller | undefined;
 
   /**
    * Total amount of energy available in all spawns and extensions in the room.
    */
-  energyAvailable: number;
+  public readonly energyAvailable: number;
 
   /**
    * Total amount of energyCapacity of all spawns and extensions in the room.
    */
-  energyCapacityAvailable: number;
+  public energyCapacityAvailable: number;
 
   /**
    * A shorthand to Memory.rooms[room.name]. You can use it for quick access the room’s specific memory data object.
    */
-  memory: RoomMemory;
+  public memory: RoomMemory;
 
   /**
    * One of the following constants:
    * MODE_SIMULATION, MODE_SURVIVAL, MODE_WORLD, MODE_ARENA
    */
-  mode: RoomModes;
+  public readonly mode: RoomModes;
 
   /**
    * The name of the room.
    */
-  name: string;
+  public readonly name: RoomName;
 
   /**
    * The Storage structure of this room, if present, otherwise undefined.
    */
-  storage: StructureStorage;
+  public readonly storage: StructureStorage;
 
   /**
    * The Terminal structure of this room, if present, otherwise undefined.
    */
-  terminal: Terminal;
+  public readonly terminal: Terminal;
 
   /**
    * CPU cost: CONST
@@ -85,7 +75,7 @@ interface Room {
    * @param structureType One of the STRUCTURE_* constants.
    * @returns Result Code: OK, ERR_INVALID_TARGET, ERR_FULL, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
    */
-  createConstructionSite(x: number, y: number, structureType: StructureType<any>): ResponseCode;
+  public createConstructionSite(x: number, y: number, structureType: StructureType<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -96,7 +86,7 @@ interface Room {
    * @param structureType One of the STRUCTURE_* constants.
    * @returns Result Code: OK, ERR_INVALID_TARGET, ERR_FULL, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
    */
-  createConstructionSite(pos: RoomPosition | RoomObject, structureType: StructureType<any>): ResponseCode;
+  public createConstructionSite(pos: RoomPosition | RoomObject, structureType: StructureType<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -111,7 +101,7 @@ interface Room {
    * @param secondaryColor The secondary color of a new flag. Should be one of the COLOR_* constants. The default value is equal to color.
    * @returns Result Code: OK, ERR_NAME_EXISTS, ERR_INVALID_ARGS
    */
-  createFlag(x: number, y: number, name?: string, color?: Color, secondaryColor?: Color): ResponseCode;
+  public createFlag(x: number, y: number, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -125,7 +115,7 @@ interface Room {
    * @param secondaryColor The secondary color of a new flag. Should be one of the COLOR_* constants. The default value is equal to color.
    * @returns Result Code: OK, ERR_NAME_EXISTS, ERR_INVALID_ARGS
    */
-  createFlag(pos: RoomPosition | RoomObject, name?: string, color?: Color, secondaryColor?: Color): ResponseCode;
+  public createFlag(pos: RoomPosition | RoomObject, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode;
 
   /**
    * CPU cost: AVERAGE
@@ -136,7 +126,7 @@ interface Room {
    * @param opts An object with additional options
    * @returns An array with the objects found.
    */
-  find<T extends RoomObject | RoomPosition>(type: FindType<T>, opts?: FilterOptions<T>): T[];
+  public find<T extends RoomObject | RoomPosition>(type: FindType<T>, opts?: FilterOptions<T>): T[];
 
   /**
    * CPU cost: HIGH
@@ -148,7 +138,7 @@ interface Room {
    * @returns The room direction constant, one of the following: FIND_EXIT_TOP, FIND_EXIT_RIGHT, FIND_EXIT_BOTTOM, FIND_EXIT_LEFT
    * Or one of the following error codes: ERR_NO_PATH, ERR_INVALID_ARGS
    */
-  findExitTo(room: string | Room): FindType<RoomPosition> | ResponseCode;
+  public findExitTo(room: RoomNameOrString | Room): FindType<RoomPosition> | ResponseCode;
 
   /**
    * CPU cost: HIGH
@@ -160,7 +150,7 @@ interface Room {
    * @param opts (optional) An object containing additonal pathfinding flags
    * @returns An array with path steps
    */
-  findPath(fromPos: RoomPosition, toPos: RoomPosition, opts?: FindPathOpts): PathStep[];
+  public findPath(fromPos: RoomPosition, toPos: RoomPosition, opts?: FindPathOpts): PathStep[];
 
   /**
    * CPU cost: LOW
@@ -171,7 +161,7 @@ interface Room {
    * @param y The Y position.
    * @returns A RoomPosition object or null if it cannot be obtained.
    */
-  getPositionAt(x: number, y: number): RoomPosition | null;
+  public getPositionAt(x: number, y: number): RoomPosition | null;
 
   /**
    * CPU cost: AVERAGE
@@ -182,7 +172,7 @@ interface Room {
    * @param y The Y position.
    * @returns An array with objects at the specified position
    */
-  lookAt(x: number, y: number): LookAtResult[];
+  public lookAt(x: number, y: number): LookAtResult[];
 
   /**
    * CPU cost: AVERAGE
@@ -192,7 +182,7 @@ interface Room {
    * @param target Can be a RoomPosition object or any object containing RoomPosition.
    * @returns An array with objects at the specified position
    */
-  lookAt(target: RoomPosition | RoomObject): LookAtResult[];
+  public lookAt(target: RoomPosition | RoomObject): LookAtResult[];
 
   /**
    * CPU cost: AVERAGE
@@ -206,7 +196,8 @@ interface Room {
    * @param asArray Set to true if you want to get the result as a plain array.
    * @returns An object with all the objects in the specified area
    */
-  lookAtArea(top: number, left: number, bottom: number, right: number, asArray?: boolean): LookAtResultMatrix | LookAtResultWithPos[];
+  public lookAtArea(top: number, left: number, bottom: number, right: number,
+                    asArray?: boolean): LookAtResultMatrix | LookAtResultWithPos[];
 
   /**
    * CPU cost: LOW
@@ -218,7 +209,7 @@ interface Room {
    * @param y The Y position.
    * @returns An array of objects of the given type at the specified position if found.
    */
-  lookForAt<T>(type: LookType<T>, x: number, y: number): T[] | null;
+  public lookForAt<T>(type: LookType<T>, x: number, y: number): T[] | null;
 
   /**
    * CPU cost: LOW
@@ -229,7 +220,7 @@ interface Room {
    * @param target Can be a RoomPosition object or any object containing RoomPosition.
    * @returns An array of objects of the given type at the specified position if found.
    */
-  lookForAt<T>(type: LookType<T>, target: RoomPosition | RoomObject): T[] | null;
+  public lookForAt<T>(type: LookType<T>, target: RoomPosition | RoomObject): T[] | null;
 
   /**
    * CPU cost: LOW
@@ -245,7 +236,7 @@ interface Room {
    * @param asArray Set to true if you want to get the result as a plain array.
    * @returns An object with all the objects of the given type in the specified area
    */
-  lookForAtArea(type: LookType<any>, top: number, left: number, bottom: number, right: number, asArray?: boolean): LookAtResultMatrix |
-    LookAtResultWithPos[];
+  public lookForAtArea(type: LookType<any>, top: number, left: number, bottom: number, right: number,
+                       asArray?: boolean): LookAtResultMatrix | LookAtResultWithPos[];
 
 }

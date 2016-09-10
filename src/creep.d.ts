@@ -1,86 +1,80 @@
-declare const Creep: CreepConstructor;
-
-interface CreepConstructor {
-  prototype: Creep;
-}
-
 /**
  * Creeps are your units. Creeps can move, harvest energy, construct structures, attack another creeps, and perform other actions. Each
  * creep consists of up to 50 body parts.
  */
-interface Creep extends RoomObject {
+declare class Creep extends RoomObject {
 
   /**
    * An array describing the creep’s body.
    */
-  body: BodyPart[];
+  public readonly body: BodyPart[];
 
   /**
    * An object with the creep's cargo contents. Each object key is one of the RESOURCE_* constants, values are resources amounts. Use
    * lodash.sum to get the total amount of contents
    */
-  carry: StoreDefinition;
+  public readonly carry: StoreContents;
 
   /**
    * The total amount of resources the creep can carry.
    */
-  carryCapacity: number;
+  public readonly carryCapacity: number;
 
   /**
    * The movement fatigue indicator. If it is greater than zero, the creep cannot move.
    */
-  fatigue: number;
+  public readonly fatigue: number;
 
   /**
    * The current amount of hit points of the creep.
    */
-  hits: number;
+  public readonly hits: number;
 
   /**
    * The maximum amount of hit points of the creep.
    */
-  hitsMax: number;
+  public readonly hitsMax: number;
 
   /**
    * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
    */
-  id: string;
+  public readonly id: CreepId;
 
   /**
    * A shorthand to Memory.creeps[creep.name]. You can use it for quick access the creep’s specific memory data object.
    */
-  memory: CreepMemory;
+  public memory: CreepMemory;
 
   /**
    * Whether it is your creep or foe.
    */
-  my: boolean;
+  public readonly my: boolean;
 
   /**
    * Creep’s name. You can choose the name while creating a new creep, and it cannot be changed later. This name is a hash key to access
    * the creep via the Game.creeps object.
    */
-  name: string;
+  public readonly name: CreepName;
 
   /**
    * An object with the creep’s owner info
    */
-  owner: Owner;
+  public readonly owner: Owner;
 
   /**
    * The text message that the creep was saying at the last tick.
    */
-  saying: string;
+  public readonly saying: string;
 
   /**
    * Whether this creep is still being spawned.
    */
-  spawning: boolean;
+  public readonly spawning: boolean;
 
   /**
    * The remaining amount of game ticks after which the creep will die.
    */
-  ticksToLive: number;
+  public readonly ticksToLive: number;
 
   /**
    * CPU cost: CONST
@@ -92,7 +86,7 @@ interface Creep extends RoomObject {
    * @param target The target object to be attacked.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  attack(target: Creep | Structure): ResponseCode;
+  public attack(target: Creep | Structure<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -104,7 +98,7 @@ interface Creep extends RoomObject {
    * @param target The target controller object.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  attackController(target: Controller): ResponseCode;
+  public attackController(target: Controller): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -116,7 +110,7 @@ interface Creep extends RoomObject {
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART,
    *     ERR_RCL_NOT_ENOUGH
    */
-  build(target: ConstructionSite): ResponseCode;
+  public build(target: ConstructionSite): ResponseCode;
 
   /**
    * CPU cost: NONE
@@ -126,7 +120,7 @@ interface Creep extends RoomObject {
    * @param methodName The name of a creep's method to be cancelled.
    * @returns Result Code: OK, ERR_NOT_FOUND
    */
-  cancelOrder(methodName: string): ResponseCode;
+  public cancelOrder(methodName: string): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -138,7 +132,7 @@ interface Creep extends RoomObject {
    * @param target The target controller object.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE, ERR_NO_BODYPART, ERR_GCL_NOT_ENOUGH
    */
-  claimController(target: Controller): ResponseCode;
+  public claimController(target: Controller): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -150,7 +144,7 @@ interface Creep extends RoomObject {
    * @param target The target structure.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  dismantle(target: Structure): ResponseCode;
+  public dismantle(target: Structure<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -161,7 +155,7 @@ interface Creep extends RoomObject {
    * @param amount The amount of resource units to be dropped. If omitted, all the available carried amount is used.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES
    */
-  drop(resourceType: ResourceType, amount?: number): ResponseCode;
+  public drop(resourceType: ResourceType, amount?: number): ResponseCode;
 
   /**
    * CPU cost: NONE
@@ -171,7 +165,7 @@ interface Creep extends RoomObject {
    * @param type A body part type, one of the following body part constants: MOVE, WORK, CARRY, ATTACK, RANGED_ATTACK, HEAL, TOUGH, CLAIM
    * @returns A number representing the quantity of body parts.
    */
-  getActiveBodyparts(type: BodyPartType): number;
+  public getActiveBodyparts(type: BodyPartType): number;
 
   /**
    * CPU cost: CONST
@@ -184,7 +178,7 @@ interface Creep extends RoomObject {
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_FOUND, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE,
    * ERR_NO_BODYPART
    */
-  harvest(target: Source | Mineral): ResponseCode;
+  public harvest(target: Source | Mineral): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -195,7 +189,7 @@ interface Creep extends RoomObject {
    * @param target The target creep object.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  heal(target: Creep): ResponseCode;
+  public heal(target: Creep): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -205,7 +199,7 @@ interface Creep extends RoomObject {
    * @param direction Direction to move.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_TIRED, ERR_NO_BODYPART
    */
-  move(direction: Direction): ResponseCode;
+  public move(direction: Direction): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -216,7 +210,7 @@ interface Creep extends RoomObject {
    *     serialized string form are accepted.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_FOUND, ERR_INVALID_ARGS, ERR_TIRED, ERR_NO_BODYPART
    */
-  moveByPath(path: PathStep[] | RoomPosition[] | string): ResponseCode;
+  public moveByPath(path: PathStep[] | RoomPosition[] | SerializedPath): ResponseCode;
 
   /**
    * CPU cost: HIGH
@@ -230,7 +224,7 @@ interface Creep extends RoomObject {
    *     serializeMemory, noPathFinding
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_TIRED, ERR_NO_BODYPART, ERR_INVALID_TARGET, ERR_NO_PATH
    */
-  moveTo(x: number, y: number, opts?: MoveToOpts & FindPathOpts): ResponseCode;
+  public moveTo(x: number, y: number, opts?: MoveToOpts & FindPathOpts): ResponseCode;
 
   /**
    * CPU cost: HIGH
@@ -244,7 +238,7 @@ interface Creep extends RoomObject {
    *     serializeMemory, noPathFinding
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_TIRED, ERR_NO_BODYPART, ERR_INVALID_TARGET, ERR_NO_PATH
    */
-  moveTo(target: RoomPosition | RoomObject, opts?: MoveToOpts & FindPathOpts): ResponseCode;
+  public moveTo(target: RoomPosition | RoomObject, opts?: MoveToOpts & FindPathOpts): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -254,7 +248,7 @@ interface Creep extends RoomObject {
    * @param enabled Whether to enable notification or disable.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_INVALID_ARGS
    */
-  notifyWhenAttacked(enabled: boolean): ResponseCode;
+  public notifyWhenAttacked(enabled: boolean): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -265,7 +259,7 @@ interface Creep extends RoomObject {
    * @param target The target object to be picked up.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE
    */
-  pickup(target: Resource): ResponseCode;
+  public pickup(target: Resource): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -276,7 +270,7 @@ interface Creep extends RoomObject {
    * @param target The target object to be attacked.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  rangedAttack(target: Creep | Structure): ResponseCode;
+  public rangedAttack(target: Creep | Structure<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -287,7 +281,7 @@ interface Creep extends RoomObject {
    * @param target The target creep object.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  rangedHeal(target: Creep): ResponseCode;
+  public rangedHeal(target: Creep): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -297,7 +291,7 @@ interface Creep extends RoomObject {
    *
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NO_BODYPART
    */
-  rangedMassAttack(): ResponseCode;
+  public rangedMassAttack(): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -308,7 +302,7 @@ interface Creep extends RoomObject {
    * @param target he target structure to be repaired.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  repair(target: Structure): ResponseCode;
+  public repair(target: Structure<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -320,7 +314,7 @@ interface Creep extends RoomObject {
    * @param target The target controller object to be reserved.
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  reserveController(target: Controller): ResponseCode;
+  public reserveController(target: Controller): ResponseCode;
 
   /**
    * CPU cost: NONE
@@ -332,7 +326,7 @@ interface Creep extends RoomObject {
    * @param toPublic Set to true to allow other players to see this message. Default is false.
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY
    */
-  say(message: string, toPublic?: boolean): ResponseCode;
+  public say(message: string, toPublic?: boolean): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -341,7 +335,7 @@ interface Creep extends RoomObject {
    *
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY
    */
-  suicide(): ResponseCode;
+  public suicide(): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -354,7 +348,7 @@ interface Creep extends RoomObject {
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE,
    *     ERR_INVALID_ARGS
    */
-  transfer(target: Creep | Structure, resourceType: ResourceType, amount?: number): ResponseCode;
+  public transfer(target: Creep | Structure<any>, resourceType: ResourceType, amount?: number): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -367,7 +361,7 @@ interface Creep extends RoomObject {
    * @param target The target controller object to be upgraded.
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  upgradeController(target: Controller): ResponseCode;
+  public upgradeController(target: Controller): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -382,7 +376,7 @@ interface Creep extends RoomObject {
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE,
    *     ERR_INVALID_ARGS
    */
-  withdraw(target: Structure, resourceType: ResourceType, amount?: number): ResponseCode;
+  public withdraw(target: Structure<any>, resourceType: ResourceType, amount?: number): ResponseCode;
 
 }
 
@@ -391,17 +385,17 @@ interface BodyPart {
   /**
    * If the body part is boosted, this property specifies the mineral type which is used for boosting. One of the RESOURCE_* constants.
    */
-  boost: Resource | undefined;
+  readonly boost: Resource | undefined;
 
   /**
    * One of the body part types constants.
    */
-    type: BodyPartType;
+  readonly type: BodyPartType;
 
   /**
    * The remaining amount of hit points of this body part.
    */
-  hits: number;
+  readonly hits: number;
 
 }
 

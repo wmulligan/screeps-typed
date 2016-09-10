@@ -1,6 +1,54 @@
-interface StoreDefinition {
-  [resource: string]: number;
-  energy: number;
+/**
+ * Unique names for objects
+ */
+declare class Name<T> extends String {
+  private readonly __type__: T; // tslint:disable-line
+}
+declare class RoomName extends Name<Room> {
+}
+declare class CreepName extends Name<Creep> {
+}
+declare class FlagName extends Name<Flag> {
+}
+declare class SpawnName extends Name<Spawn> {
+}
+
+// these are inputs into our functions which allow hardcoded strings
+type RoomNameOrString = RoomName | string;
+type CreepNameOrString = CreepName | string;
+type FlagNameOrString = FlagName | string;
+type SpawnNameOrString = SpawnName | string;
+
+/**
+ * Unique ids for objects
+ */
+declare class ObjectId<T> extends String {
+  private readonly __type__: T; // tslint:disable-line
+}
+declare class CreepId extends ObjectId<Creep> {
+}
+declare class ConstructionSiteId extends ObjectId<ConstructionSite> {
+}
+declare class MineralId extends ObjectId<Mineral> {
+}
+declare class NukeId extends ObjectId<Nuke> {
+}
+declare class ResourceId extends ObjectId<Resource> {
+}
+declare class SourceId extends ObjectId<Source> {
+}
+declare class StructureId<T> extends ObjectId<T> {
+}
+
+/**
+ * Used in container, terminal, storage and creep
+ */
+interface StoreContents {
+
+  readonly [resourceType: string]: number;
+
+  readonly energy: number;
+
 }
 
 /**
@@ -11,19 +59,21 @@ interface Owner {
   /**
    * The name of the owner user.
    */
-  username: string;
+  readonly username: string;
 
 }
+
+type SerializedPath = string;
 
 interface LookAtResult {
   type: string;
   constructionSite?: ConstructionSite;
   creep?: Creep;
   energy?: Resource;
-  exit?: any;
+  exit?: FindType<RoomPosition>;
   flag?: Flag;
   source?: Source;
-  structure?: Structure;
+  structure?: Structure<any>;
   terrain?: TerrainType;
 }
 
@@ -108,6 +158,6 @@ interface FindPathOpts {
    * @param costMatrix The current CostMatrix
    * @returns The new CostMatrix to use
    */
-  costCallback?(roomName: string, costMatrix: CostMatrix): CostMatrix;
+  costCallback?(roomName: RoomName, costMatrix: CostMatrix): CostMatrix;
 
 }

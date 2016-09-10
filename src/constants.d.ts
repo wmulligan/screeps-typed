@@ -21,7 +21,8 @@ declare const ERR_RCL_NOT_ENOUGH: ResponseCode;
 declare const ERR_GCL_NOT_ENOUGH: ResponseCode;
 
 // Structures
-interface StructureType<T extends Structure> extends String { // tslint:disable-line
+declare class StructureType<T> extends String { // tslint:disable-line
+  private readonly __type__: T; // tslint:disable-line
 }
 
 declare const STRUCTURE_SPAWN: StructureType<Spawn>;
@@ -37,7 +38,7 @@ declare const STRUCTURE_STORAGE: StructureType<StructureStorage>;
 declare const STRUCTURE_TOWER: StructureType<Tower>;
 declare const STRUCTURE_OBSERVER: StructureType<Observer>;
 declare const STRUCTURE_POWER_BANK: StructureType<PowerBank>;
-declare const STRUCTURE_POWER_SPAWN: StructureType<Structure>;
+declare const STRUCTURE_POWER_SPAWN: StructureType<PowerSpawn>;
 declare const STRUCTURE_EXTRACTOR: StructureType<Extractor>;
 declare const STRUCTURE_LAB: StructureType<Lab>;
 declare const STRUCTURE_TERMINAL: StructureType<Terminal>;
@@ -75,9 +76,9 @@ declare const FIND_SOURCES_ACTIVE: FindType<Source>;
 declare const FIND_SOURCES: FindType<Source>;
 declare const FIND_DROPPED_ENERGY: FindType<Resource>;
 declare const FIND_DROPPED_RESOURCES: FindType<Resource>;
-declare const FIND_STRUCTURES: FindType<Structure>;
-declare const FIND_MY_STRUCTURES: FindType<Structure>;
-declare const FIND_HOSTILE_STRUCTURES: FindType<Structure>;
+declare const FIND_STRUCTURES: FindType<Structure<any>>;
+declare const FIND_MY_STRUCTURES: FindType<Structure<any>>;
+declare const FIND_HOSTILE_STRUCTURES: FindType<Structure<any>>;
 declare const FIND_FLAGS: FindType<Flag>;
 declare const FIND_MY_SPAWNS: FindType<Spawn>;
 declare const FIND_HOSTILE_SPAWNS: FindType<Spawn>;
@@ -109,7 +110,7 @@ declare const LOOK_ENERGY: LookType<Resource>;
 declare const LOOK_RESOURCES: LookType<Resource>;
 declare const LOOK_SOURCES: LookType<Source>;
 declare const LOOK_MINERALS: LookType<Mineral>;
-declare const LOOK_STRUCTURES: LookType<Structure>;
+declare const LOOK_STRUCTURES: LookType<Structure<any>>;
 declare const LOOK_FLAGS: LookType<Flag>;
 declare const LOOK_CONSTRUCTION_SITES: LookType<ConstructionSite>;
 declare const LOOK_NUKES: LookType<Nuke>;

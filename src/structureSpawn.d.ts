@@ -1,42 +1,36 @@
-declare const StructureSpawn: StructureSpawnConstructor;
-
-interface StructureSpawnConstructor {
-  prototype: StructureSpawn;
-}
-
 type Spawn = StructureSpawn;
 
 /**
  * Spawn is your colony center. This structure can create, renew, and recycle creeps. All your spawns are accessible through Game.spawns
  * hash list. Spawns auto-regenerate a little amount of energy each tick, so that you can easily recover even if all your creeps died.
  */
-interface StructureSpawn extends OwnedStructure {
+declare class StructureSpawn extends OwnedStructure<Spawn> {
 
   /**
    * The amount of energy containing in the spawn.
    */
-  energy: number;
+  public readonly energy: number;
 
   /**
    * The total amount of energy the spawn can contain
    */
-  energyCapacity: number;
+  public readonly energyCapacity: number;
 
   /**
    * A shorthand to Memory.spawns[spawn.name]. You can use it for quick access the spawn’s specific memory data object.
    */
-  memory: SpawnMemory;
+  public memory: SpawnMemory;
 
   /**
    * Spawn’s name. You choose the name upon creating a new spawn, and it cannot be changed later. This name is a hash key to access the
    * spawn via the Game.spawns object.
    */
-  name: string;
+  public readonly name: SpawnName;
 
   /**
    * If the spawn is in process of spawning a new creep, this object will contain the new creep’s information, or null otherwise.
    */
-  spawning: SpawningCreep;
+  public readonly spawning: SpawningCreep;
 
   /**
    * CPU cost: LOW
@@ -49,7 +43,7 @@ interface StructureSpawn extends OwnedStructure {
    *     contain another creep with the same name (hash key). If not defined, a random name will be generated.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NAME_EXISTS, ERR_BUSY, ERR_NOT_ENOUGH_ENERGY, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
    */
-  canCreateCreep(body: BodyPartType[], name?: string): ResponseCode;
+  public canCreateCreep(body: BodyPartType[], name?: CreepNameOrString): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -63,7 +57,7 @@ interface StructureSpawn extends OwnedStructure {
    * @param memory The memory of a new creep. If provided, it will be immediately stored into Memory.creeps[name].
    * @returns name of creep or: ERR_NOT_OWNER, ERR_NAME_EXISTS, ERR_BUSY, ERR_NOT_ENOUGH_ENERGY, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
    */
-  createCreep(body: BodyPartType[], name?: string, memory?: CreepMemory): ResponseCode | string;
+  public createCreep(body: BodyPartType[], name?: CreepNameOrString, memory?: CreepMemory): ResponseCode | CreepName;
 
   /**
    * CPU cost: CONST
@@ -74,7 +68,7 @@ interface StructureSpawn extends OwnedStructure {
    * @param target The target creep object.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE
    */
-  recycleCreep(target: Creep): ResponseCode;
+  public recycleCreep(target: Creep): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -87,7 +81,7 @@ interface StructureSpawn extends OwnedStructure {
    * @param target The target creep object.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_ENERGY, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE
    */
-  renewCreep(target: Creep): ResponseCode;
+  public renewCreep(target: Creep): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -100,7 +94,7 @@ interface StructureSpawn extends OwnedStructure {
    * @param amount The amount of resources to be transferred. If omitted, all the available amount is used.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE
    */
-  transferEnergy(target: Creep, amount?: number): ResponseCode;
+  public transferEnergy(target: Creep, amount?: number): ResponseCode;
 
 }
 
@@ -109,16 +103,16 @@ interface SpawningCreep {
   /**
    * The name of a new creep.
    */
-  name: string;
+  readonly name: string;
 
   /**
    * Time needed in total to complete the spawning.
    */
-  needTime: number;
+  readonly needTime: number;
 
   /**
    * Remaining time to go.
    */
-  remainingTime: number;
+  readonly remainingTime: number;
 
 }

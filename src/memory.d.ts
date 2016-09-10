@@ -2,15 +2,13 @@ declare const Memory: Memory;
 
 interface Memory {
 
-  [name: string]: any;
+  creeps: {[creepName: string]: CreepMemory};
 
-  creeps: {[name: string]: CreepMemory};
+  flags: {[flagName: string]: FlagMemory};
 
-  flags: {[name: string]: FlagMemory};
+  rooms: {[roomName: string]: RoomMemory};
 
-  rooms: {[name: string]: RoomMemory};
-
-  spawns: {[name: string]: SpawnMemory};
+  spawns: {[spawnName: string]: SpawnMemory};
 
 }
 

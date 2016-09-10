@@ -1,26 +1,26 @@
 /**
  * An energy source object. Can be harvested by creeps with a WORK body part.
  */
-interface Source extends RoomObject {
+declare class Source extends RoomObject {
 
   /**
    * The remaining amount of energy.
    */
-  energy: number;
+  public readonly energy: number;
 
   /**
    * The total amount of energy in the source.
    */
-  energyCapacity: number;
+  public readonly energyCapacity: number;
 
   /**
    * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
    */
-  id: string;
+  public readonly id: SourceId;
 
   /**
    * The remaining time after which the source will be refilled.
    */
-  ticksToRegeneration: number;
+  public readonly ticksToRegeneration: number;
 
 }

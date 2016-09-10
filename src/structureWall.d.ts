@@ -1,19 +1,13 @@
-declare const StructureWall: StructureWallConstructor;
-
-interface StructureWallConstructor {
-  prototype: StructureWall;
-}
-
 type Wall = StructureWall;
 
 /**
  * Blocks movement of all creeps.
  */
-interface StructureWall extends Structure {
+declare class StructureWall extends Structure<Wall> {
 
   /**
    * The amount of game ticks when the wall will disappear (only for automatically placed border walls at the start of the game).
    */
-  ticksToLive: number;
+  public readonly ticksToLive: number;
 
 }

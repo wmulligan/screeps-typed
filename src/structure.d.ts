@@ -1,33 +1,27 @@
-declare const Structure: StructureConstructor;
-
-interface StructureConstructor {
-  prototype: Structure;
-}
-
 /**
  * The base prototype object of all structures.
  */
-interface Structure extends RoomObject {
+declare abstract class Structure<T> extends RoomObject {
 
   /**
    * The current amount of hit points of the structure.
    */
-  hits: number;
+  public readonly hits: number;
 
   /**
    * The total amount of hit points of the structure.
    */
-  hitsMax: number;
+  public readonly hitsMax: number;
 
   /**
    * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
    */
-  id: string;
+  public readonly id: StructureId<T>;
 
   /**
    * One of the STRUCTURE_* constants.
    */
-  structureType: StructureType<any>;
+  public readonly structureType: StructureType<T>;
 
   /**
    * CPU cost: CONST
@@ -36,7 +30,7 @@ interface Structure extends RoomObject {
    *
    * @returns Return code: OK, ERR_NOT_OWNER
    */
-  destroy(): ResponseCode;
+  public destroy(): ResponseCode;
 
   /**
    * CPU cost: AVERAGE
@@ -46,7 +40,7 @@ interface Structure extends RoomObject {
    *
    * @returns A boolean value.
    */
-  isActive(): boolean;
+  public isActive(): boolean;
 
   /**
    * CPU cost: CONST
@@ -56,6 +50,6 @@ interface Structure extends RoomObject {
    * @param enabled Whether to enable notification or disable.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_INVALID_ARGS
    */
-  notifyWhenAttacked(enabled: boolean): ResponseCode;
+  public notifyWhenAttacked(enabled: boolean): ResponseCode;
 
 }

@@ -1,9 +1,11 @@
+declare const PathFinder: PathFinder;
+
 /**
  * Contains powerful methods for pathfinding in the game world. Support exists for custom navigation costs and paths which span multiple
  * rooms. Additionally PathFinder can search for paths through rooms you can't see, although you won't be able to detect any dynamic
  * obstacles like creeps or buildings.
  */
-declare namespace PathFinder {
+interface PathFinder {
 
   /**
    * Container for custom navigation cost data. By default PathFinder will only consider terrain data (plain, swamp, wall) — if you need to
@@ -12,7 +14,7 @@ declare namespace PathFinder {
    * cost. You should avoid using large values in your CostMatrix and terrain cost flags. For example, running PathFinder.search with {
    * plainCost: 1, swampCost: 5 } is faster than running it with {plainCost: 2, swampCost: 10 } even though your paths will be the same.
    */
-  export const CostMatrix: CostMatrixConstructor;
+  readonly CostMatrix: typeof CostMatrix;
 
   /**
    * CPU cost: HIGH
@@ -24,9 +26,7 @@ declare namespace PathFinder {
    *     returned. A goal is either a RoomPosition or an object as defined below.
    * @param opts An object containing additional pathfinding flags.
    */
-  export function search(origin: RoomPosition,
-                         goal: RoomPosition | SearchGoal | (RoomPosition | SearchGoal)[],
-                         opts ?: PathFinderOpts): SearchResult;
+  search(origin: RoomPosition, goal: RoomPosition | SearchGoal | (RoomPosition | SearchGoal)[], opts ?: PathFinderOpts): SearchResult;
 
   /**
    * CPU cost: NONE
@@ -36,7 +36,7 @@ declare namespace PathFinder {
    *
    * @param isEnabled Whether to activate the new pathfinder or deactivate.
    */
-  export function use(isEnabled: boolean): void;
+  use(isEnabled: boolean): void;
 
 }
 
@@ -63,12 +63,12 @@ interface SearchResult {
   /**
    * An array of RoomPosition objects.
    */
-  path: RoomPosition[];
+  readonly path: RoomPosition[];
 
   /**
    * Total number of operations performed before this path was calculated.
    */
-  ops: number;
+  readonly ops: number;
 
 }
 
@@ -116,28 +116,7 @@ interface PathFinderOpts {
    * you may consider caching your CostMatrix to speed up your code. Please read the CostMatrix documentation below for more information on
    * CostMatrix. If you return false from the callback the requested room will not be searched, and it won't count against maxRooms.
    */
-  roomCallback?(roomName: string): boolean | CostMatrix;
-
-}
-
-interface CostMatrixConstructor {
-
-  prototype: CostMatrix;
-
-  /**
-   * Creates a new CostMatrix containing 0's for all positions.
-   */
-  new(): CostMatrix;
-
-  /**
-   * CPU cost: LOW
-   *
-   * Static method which deserializes a new CostMatrix using the return value of serialize.
-   *
-   * @param val Whatever serialize returned
-   * @returns new CostMatrix instance.
-   */
-  deserialize(val: SerializedCostMatrix): CostMatrix;
+  roomCallback?(roomName: RoomName): boolean | CostMatrix;
 
 }
 
@@ -148,7 +127,22 @@ interface CostMatrixConstructor {
  * You should avoid using large values in your CostMatrix and terrain cost flags. For example, running PathFinder.search with { plainCost:
  * 1, swampCost: 5 } is faster than running it with {plainCost: 2, swampCost: 10 } even though your paths will be the same.
  */
-interface CostMatrix {
+declare class CostMatrix {
+
+  /**
+   * CPU cost: LOW
+   *
+   * Static method which deserializes a new CostMatrix using the return value of serialize.
+   *
+   * @param val Whatever serialize returned
+   * @returns new CostMatrix instance.
+   */
+  public static deserialize(val: SerializedCostMatrix): CostMatrix;
+
+  /**
+   * Creates a new CostMatrix containing 0's for all positions.
+   */
+  constructor();
 
   /**
    * CPU cost: NONE
@@ -160,7 +154,7 @@ interface CostMatrix {
    * @param cost Cost of this position. Must be a whole number. A cost of 0 will use the terrain cost for that tile. A cost greater than or
    *     equal to 255 will be treated as unwalkable.
    */
-  set(x: number, y: number, cost: number): void;
+  public set(x: number, y: number, cost: number): void;
 
   /**
    * CPU cost: NONE
@@ -171,21 +165,21 @@ interface CostMatrix {
    * @param y Y position in the room.
    * @returns cost
    */
-  get(x: number, y: number): number;
+  public get(x: number, y: number): number;
 
   /**
    * CPU cost: LOW
    *
    * Copy this CostMatrix into a new CostMatrix with the same data.
    */
-  clone(): CostMatrix;
+  public clone(): CostMatrix;
 
   /**
    * CPU cost: LOW
    *
    * @returns a compact representation of this CostMatrix which can be stored via JSON.stringify.
    */
-  serialize(): SerializedCostMatrix;
+  public serialize(): SerializedCostMatrix;
 
 }
 

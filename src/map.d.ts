@@ -1,7 +1,7 @@
 /**
  * A global object representing world map. Use it to navigate between rooms. The object is accessible via Game.map property.
  */
-declare namespace Game.map {
+interface GameMap {
 
   /**
    * CPU cost: LOW
@@ -11,7 +11,7 @@ declare namespace Game.map {
    * @param roomName The room name.
    * @returns The exits information or null if the room not found.
    */
-  export function describeExits(roomName: string): RoomExits | null;
+  describeExits(roomName: RoomNameOrString): RoomExits | null;
 
   /**
    * CPU cost: HIGH
@@ -24,7 +24,7 @@ declare namespace Game.map {
    * FIND_EXIT_TOP, FIND_EXIT_RIGHT, FIND_EXIT_BOTTOM, FIND_EXIT_LEFT
    * Or one of the following Result codes: ERR_NO_PATH, ERR_INVALID_ARGS
    */
-  export function findExit(fromRoom: string | Room, toRoom: string | Room): FindType<RoomPosition> | ResponseCode;
+  findExit(fromRoom: RoomNameOrString | Room, toRoom: RoomNameOrString | Room): FindType<RoomPosition> | ResponseCode;
 
   /**
    * CPU cost: HIGH
@@ -36,7 +36,7 @@ declare namespace Game.map {
    * @param opts find route options
    * @returns the route array or ERR_NO_PATH code
    */
-  export function findRoute(fromRoom: string | Room, toRoom: string | Room, opts?: FindRouteOpts): RoomPathStep[] | ResponseCode;
+  findRoute(fromRoom: RoomNameOrString | Room, toRoom: RoomNameOrString | Room, opts?: FindRouteOpts): RoomPathStep[] | ResponseCode;
 
   /**
    * CPU cost: NONE
@@ -48,7 +48,7 @@ declare namespace Game.map {
    * @param roomName2 The name of the second room.
    * @returns A number of rooms between the given two rooms.
    */
-  export function getRoomLinearDistance(roomName1: string, roomName2: string): number;
+  getRoomLinearDistance(roomName1: RoomNameOrString, roomName2: RoomNameOrString): number;
 
   /**
    * CPU cost: LOW
@@ -60,7 +60,7 @@ declare namespace Game.map {
    * @param roomName The room name.
    * @returns One of the following string values: plain, swamp, wall
    */
-  export function getTerrainAt(x: number, y: number, roomName: string): TerrainType;
+  getTerrainAt(x: number, y: number, roomName: RoomNameOrString): TerrainType;
 
   /**
    * CPU cost: LOW
@@ -70,7 +70,7 @@ declare namespace Game.map {
    * @param pos The position object.
    * @returns One of the following string values: plain, swamp, wall
    */
-  export function getTerrainAt(pos: RoomPosition): TerrainType;
+  getTerrainAt(pos: RoomPosition): TerrainType;
 
   /**
    * CPU cost: AVERAGE
@@ -80,31 +80,33 @@ declare namespace Game.map {
    * @param roomName The room name.
    * @returns A boolean value.
    */
-  export function isRoomProtected(roomName: string): boolean;
+  isRoomProtected(roomName: RoomNameOrString): boolean;
 
 }
 
 interface RoomExits {
 
+  readonly [direction: number]: RoomName | undefined;
+
   /**
    * Direction TOP
    */
-    '1': string | null;
+  readonly 1: RoomName | undefined;
 
   /**
    * Direction RIGHT
    */
-    '3': string | null;
+  readonly 3: RoomName | undefined;
 
   /**
    * Direction BOTTOM
    */
-    '5': string | null;
+  readonly 5: RoomName | undefined;
 
   /**
    * Direction LEFT
    */
-    '7': string | null;
+  readonly 7: RoomName | undefined;
 
 }
 
@@ -115,14 +117,14 @@ interface FindRouteOpts {
    * can use this to do things like prioritize your own rooms, or avoid some rooms. You can return a floating point cost or Infinity to
    * block the room.
    */
-  routeCallback: (roomName: string, fromRoomName: string) => number;
+  routeCallback: (roomName: RoomName, fromRoomName: RoomName) => number;
 
 }
 
 interface RoomPathStep {
 
-  exit: FindType<RoomPosition>;
+  readonly exit: FindType<RoomPosition>;
 
-  room: string;
+  readonly room: RoomName;
 
 }

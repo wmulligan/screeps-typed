@@ -1,26 +1,20 @@
-declare const StructureTower: StructureTowerConstructor;
-
-interface StructureTowerConstructor {
-  prototype: StructureTower;
-}
-
 type Tower = StructureTower;
 
 /**
  * Remotely attacks or heals creeps, or repairs structures. Can be targeted to any object in the room. However, its effectiveness linearly
  * depends on the distance. Each action consumes energy.
  */
-interface StructureTower extends OwnedStructure {
+declare class StructureTower extends OwnedStructure<Tower> {
 
   /**
    * The amount of energy containing in this structure.
    */
-  energy: number;
+  public readonly energy: number;
 
   /**
    * The total amount of energy this structure can contain.
    */
-  energyCapacity: number;
+  public readonly energyCapacity: number;
 
   /**
    * CPU cost: CONST
@@ -31,7 +25,7 @@ interface StructureTower extends OwnedStructure {
    * @param target The target creep.
    * @returns Return code: OK, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_RCL_NOT_ENOUGH
    */
-  attack(target: Creep): ResponseCode;
+  public attack(target: Creep): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -42,7 +36,7 @@ interface StructureTower extends OwnedStructure {
    * @param target The target creep.
    * @returns Return code: OK, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_RCL_NOT_ENOUGH
    */
-  heal(target: Creep): ResponseCode;
+  public heal(target: Creep): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -53,7 +47,7 @@ interface StructureTower extends OwnedStructure {
    * @param target The target structure.
    * @returns Return code: OK, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_RCL_NOT_ENOUGH
    */
-  repair(target: Structure): ResponseCode;
+  public repair(target: Structure<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -66,6 +60,6 @@ interface StructureTower extends OwnedStructure {
    * @param amount The amount of resources to be transferred. If omitted, all the available amount is used.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE
    */
-  transferEnergy(target: Creep, amount?: number): ResponseCode;
+  public transferEnergy(target: Creep, amount?: number): ResponseCode;
 
 }

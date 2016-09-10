@@ -1,45 +1,39 @@
-declare const StructureLab: StructureLabConstructor;
-
-interface StructureLabConstructor {
-  prototype: StructureLab;
-}
-
 type Lab = StructureLab;
 
 /**
  * Produces mineral compounds from base minerals and boosts creeps.
  */
-interface StructureLab extends OwnedStructure {
+declare class StructureLab extends OwnedStructure<Lab> {
 
   /**
    * The amount of game ticks the lab has to wait until the next reaction is possible.
    */
-  cooldown: number;
+  public readonly cooldown: number;
 
   /**
    * The amount of energy containing in the lab. Energy is used for boosting creeps.
    */
-  energy: number;
+  public readonly energy: number;
 
   /**
    * The total amount of energy the lab can contain.
    */
-  energyCapacity: number;
+  public readonly energyCapacity: number;
 
   /**
    * The amount of mineral resources containing in the lab.
    */
-  mineralAmount: number;
+  public readonly mineralAmount: number;
 
   /**
    * The type of minerals containing in the lab. Labs can contain only one mineral type at the same time.
    */
-  mineralType: ResourceType;
+  public readonly mineralType: ResourceType;
 
   /**
    * The total amount of minerals the lab can contain.
    */
-  mineralCapacity: number;
+  public readonly mineralCapacity: number;
 
   /**
    * CPU cost: CONST
@@ -53,7 +47,7 @@ interface StructureLab extends OwnedStructure {
    *     are boosted.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_FOUND, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE
    */
-  boostCreep(creep: Creep, bodyPartsCount?: number): ResponseCode;
+  public boostCreep(creep: Creep, bodyPartsCount?: number): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -66,7 +60,7 @@ interface StructureLab extends OwnedStructure {
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE, ERR_INVALID_ARGS,
    *     ERR_TIRED
    */
-  runReaction(lab1: Lab, lab2: Lab): ResponseCode;
+  public runReaction(lab1: Lab, lab2: Lab): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -80,6 +74,6 @@ interface StructureLab extends OwnedStructure {
    * @param amount The amount of resources to be transferred. If omitted, all the available amount is used.
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE, ERR_INVALID_ARGS
    */
-  transfer(target: Creep, resourceType: ResourceType, amount?: number): ResponseCode;
+  public transfer(target: Creep, resourceType: ResourceType, amount?: number): ResponseCode;
 
 }

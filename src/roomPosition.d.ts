@@ -1,7 +1,23 @@
-declare const RoomPosition: RoomPositionConstructor;
+/**
+ * An object representing the specified position in the room. Every object in the room contains RoomPosition as the pos property. The
+ * position object of a custom location can be obtained using the Room.getPositionAt() method or using the constructor.
+ */
+declare class RoomPosition {
 
-interface RoomPositionConstructor {
-  prototype: RoomPosition;
+  /**
+   * The name of the room.
+   */
+  public readonly roomName: RoomName;
+
+  /**
+   * X position in the room.
+   */
+  public readonly x: number;
+
+  /**
+   * Y position in the room.
+   */
+  public readonly y: number;
 
   /**
    * You can create new RoomPosition object using its constructor.
@@ -10,30 +26,7 @@ interface RoomPositionConstructor {
    * @param y Y position in the room.
    * @param roomName The room name.
    */
-  new(x: number, y: number, roomName: string): RoomPosition;
-
-}
-
-/**
- * An object representing the specified position in the room. Every object in the room contains RoomPosition as the pos property. The
- * position object of a custom location can be obtained using the Room.getPositionAt() method or using the constructor.
- */
-interface RoomPosition {
-
-  /**
-   * The name of the room.
-   */
-  roomName: string;
-
-  /**
-   * X position in the room.
-   */
-  x: number;
-
-  /**
-   * Y position in the room.
-   */
-  y: number;
+  constructor(x: number, y: number, roomName: RoomNameOrString);
 
   /**
    * CPU cost: CONST
@@ -43,7 +36,7 @@ interface RoomPosition {
    * @param structureType One of the STRUCTURE_* constants.
    * @returns Result Code: OK, ERR_INVALID_TARGET, ERR_FULL, ERR_INVALID_ARGS, ERR_RCL_NOT_ENOUGH
    */
-  createConstructionSite(structureType: StructureType<any>): ResponseCode;
+  public createConstructionSite(structureType: StructureType<any>): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -56,7 +49,7 @@ interface RoomPosition {
    * @param secondaryColor The secondary color of a new flag. Should be one of the COLOR_* constants. The default value is equal to color.
    * @returns Result Code: OK, ERR_NAME_EXISTS, ERR_INVALID_ARGS
    */
-  createFlag(name?: string, color?: Color, secondaryColor?: Color): ResponseCode;
+  public createFlag(name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode;
 
   /**
    * CPU cost: HIGH
@@ -67,7 +60,7 @@ interface RoomPosition {
    * @param opts An object containing pathfinding options (see Room.findPath), or one of the following: filter, algorithm
    * @returns The closest object if found, null otherwise.
    */
-  findClosestByPath<T extends RoomObject | RoomPosition>(type: FindType<T>, opts?: FindClosestPathOpts<T>): T | null;
+  public findClosestByPath<T extends RoomObject | RoomPosition>(type: FindType<T>, opts?: FindClosestPathOpts<T>): T | null;
 
   /**
    * CPU cost: HIGH
@@ -78,7 +71,7 @@ interface RoomPosition {
    * @param opts An object containing pathfinding options (see Room.findPath), or one of the following: filter, algorithm
    * @returns The closest object if found, null otherwise.
    */
-  findClosestByPath<T extends RoomObject | RoomPosition>(objects: T[] | RoomPosition[], opts?: FindClosestPathOpts<T>): T | null;
+  public findClosestByPath<T extends RoomObject | RoomPosition>(objects: T[] | RoomPosition[], opts?: FindClosestPathOpts<T>): T | null;
 
   /**
    * CPU cost: AVERAGE
@@ -89,7 +82,7 @@ interface RoomPosition {
    * @param opts
    * @returns The closest object if found, null otherwise.
    */
-  findClosestByRange<T extends RoomObject | RoomPosition>(type: FindType<T>, opts?: FilterOptions<T>): T | null;
+  public findClosestByRange<T extends RoomObject | RoomPosition>(type: FindType<T>, opts?: FilterOptions<T>): T | null;
 
   /**
    * CPU cost: AVERAGE
@@ -100,7 +93,7 @@ interface RoomPosition {
    * @param opts
    * @returns The closest object if found, null otherwise.
    */
-  findClosestByRange<T extends RoomObject | RoomPosition>(objects: T[], opts?: FilterOptions<T>): T | null;
+  public findClosestByRange<T extends RoomObject | RoomPosition>(objects: T[], opts?: FilterOptions<T>): T | null;
 
   /**
    * CPU cost: AVERAGE
@@ -112,7 +105,7 @@ interface RoomPosition {
    * @param opts See Room.find.
    * @return An array with the objects found.
    */
-  findInRange<T extends RoomObject | RoomPosition>(type: FindType<T>, range: number, opts?: FilterOptions<T>): T[];
+  public findInRange<T extends RoomObject | RoomPosition>(type: FindType<T>, range: number, opts?: FilterOptions<T>): T[];
 
   /**
    * CPU cost: AVERAGE
@@ -124,7 +117,7 @@ interface RoomPosition {
    * @param opts See Room.find.
    * @return An array with the objects found.
    */
-  findInRange<T extends RoomObject | RoomPosition>(objects: T[] | RoomPosition[], range: number, opts?: FilterOptions<T>): T[];
+  public findInRange<T extends RoomObject | RoomPosition>(objects: T[] | RoomPosition[], range: number, opts?: FilterOptions<T>): T[];
 
   /**
    * CPU cost: HIGH
@@ -137,7 +130,7 @@ interface RoomPosition {
    * @param opts An object containing pathfinding options flags (see Room.findPath for more details).
    * @returns An array with path steps
    */
-  findPathTo(x: number, y: number, opts?: FindPathOpts): PathStep[];
+  public findPathTo(x: number, y: number, opts?: FindPathOpts): PathStep[];
 
   /**
    * CPU cost: HIGH
@@ -149,7 +142,7 @@ interface RoomPosition {
    * @param opts An object containing pathfinding options flags (see Room.findPath for more details).
    * @returns An array with path steps
    */
-  findPathTo(target: RoomPosition | RoomObject, opts?: FindPathOpts): PathStep[];
+  public findPathTo(target: RoomPosition | RoomObject, opts?: FindPathOpts): PathStep[];
 
   /**
    * CPU cost: LOW
@@ -160,7 +153,7 @@ interface RoomPosition {
    * @param y Y position in the room.
    * @returns A number representing one of the direction constants.
    */
-  getDirectionTo(x: number, y: number): Direction;
+  public getDirectionTo(x: number, y: number): Direction;
 
   /**
    * CPU cost: LOW
@@ -170,7 +163,7 @@ interface RoomPosition {
    * @param target Can be a RoomPosition object or any object containing RoomPosition.
    * @returns A number representing one of the direction constants.
    */
-  getDirectionTo(target: RoomPosition | RoomObject): Direction;
+  public getDirectionTo(target: RoomPosition | RoomObject): Direction;
 
   /**
    * CPU cost: LOW
@@ -181,7 +174,7 @@ interface RoomPosition {
    * @param y Y position in the room.
    * @returns A number of squares to the given position.
    */
-  getRangeTo(x: number, y: number): number;
+  public getRangeTo(x: number, y: number): number;
 
   /**
    * CPU cost: LOW
@@ -191,7 +184,7 @@ interface RoomPosition {
    * @param target Can be a RoomPosition object or any object containing RoomPosition.
    * @returns A number of squares to the given position.
    */
-  getRangeTo(target: RoomPosition | RoomObject): number;
+  public getRangeTo(target: RoomPosition | RoomObject): number;
 
   /**
    * CPU cost: LOW
@@ -203,7 +196,7 @@ interface RoomPosition {
    * @param range The range distance.
    * @returns A boolean value.
    */
-  inRangeTo(x: number, y: number, range: number): boolean;
+  public inRangeTo(x: number, y: number, range: number): boolean;
 
   /**
    * CPU cost: LOW
@@ -214,7 +207,7 @@ interface RoomPosition {
    * @param range The range distance.
    * @returns A boolean value.
    */
-  inRangeTo(toPos: RoomPosition | RoomObject, range: number): boolean;
+  public inRangeTo(toPos: RoomPosition | RoomObject, range: number): boolean;
 
   /**
    * CPU cost: LOW
@@ -225,7 +218,7 @@ interface RoomPosition {
    * @param y Y position in the room.
    * @returns A boolean value.
    */
-  isEqualTo(x: number, y: number): boolean;
+  public isEqualTo(x: number, y: number): boolean;
 
   /**
    * CPU cost: LOW
@@ -235,7 +228,7 @@ interface RoomPosition {
    * @param target Can be a RoomPosition object or any object containing RoomPosition.
    * @returns A boolean value.
    */
-  isEqualTo(target: RoomPosition | RoomObject): boolean;
+  public isEqualTo(target: RoomPosition | RoomObject): boolean;
 
   /**
    * CPU cost: LOW
@@ -246,7 +239,7 @@ interface RoomPosition {
    * @param y Y position in the room.
    * @returns A boolean value.
    */
-  isNearTo(x: number, y: number): boolean;
+  public isNearTo(x: number, y: number): boolean;
 
   /**
    * CPU cost: LOW
@@ -256,7 +249,7 @@ interface RoomPosition {
    * @param target Can be a RoomPosition object or any object containing RoomPosition.
    * @returns A boolean value.
    */
-  isNearTo(target: RoomPosition | RoomObject): boolean;
+  public isNearTo(target: RoomPosition | RoomObject): boolean;
 
   /**
    * CPU cost: AVERAGE
@@ -265,7 +258,7 @@ interface RoomPosition {
    *
    * @returns An array with objects at the specified position
    */
-  look(): LookAtResult[];
+  public look(): LookAtResult[];
 
   /**
    * CPU cost: LOW
@@ -275,7 +268,7 @@ interface RoomPosition {
    * @param type One of the LOOK_* constants.
    * @returns An array of objects of the given type at the specified position if found.
    */
-  lookFor<T extends RoomObject>(type: LookType<T>): T[];
+  public lookFor<T extends RoomObject>(type: LookType<T>): T[];
 
 }
 
@@ -296,14 +289,14 @@ interface FilterOptions<T> {
   /**
    * Only the objects which pass the filter using the Lodash.filter method will be used.
    */
-  filter?: ListIterator<T, boolean> | string; // TODO: support maps
+  filter?: ListIterator<T> | string | {};
 
 }
 
 // from lodash
 
-interface ListIterator<T, TResult> {
-  (value: T, index: number, collection: List<T>): TResult;
+interface ListIterator<T> {
+  (value: T, index: number, collection: List<T>): boolean;
 }
 
 interface List<T> {

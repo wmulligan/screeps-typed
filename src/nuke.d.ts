@@ -1,28 +1,22 @@
-declare const Nuke: NukeConstructor;
-
-interface NukeConstructor {
-  prototype: Nuke;
-}
-
 /**
  * A nuke landing position. This object cannot be removed or modified. You can find incoming nukes in the room using the FIND_NUKES
  * constant.
  */
-interface Nuke extends RoomObject {
+declare class Nuke extends RoomObject {
 
   /**
    * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
    */
-  id: string;
+  public readonly id: NukeId;
 
   /**
    * The name of the room where this nuke has been launched from.
    */
-  launchRoomName: string;
+  public readonly launchRoomName: RoomName;
 
   /**
    * The remaining landing time.
    */
-  timeToLand: number;
+  public readonly timeToLand: number;
 
 }

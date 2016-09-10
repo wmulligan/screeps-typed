@@ -1,19 +1,23 @@
+declare const RawMemory: RawMemory;
+
 /**
  * RawMemory object allows to implement your own memory stringifier instead of built-in serializer based on JSON.stringify.
  */
-declare namespace RawMemory {
+interface RawMemory {
 
   /**
    * Get a raw string representation of the Memory object.
    *
    * @returns Returns a string value.
    */
-  export function get(): string;
+  get(): SerializedMemory;
 
   /**
    * Set new memory value.
    * @param value New memory value as a string.
    */
-  export function set(value: string): void;
+  set(value: SerializedMemory): void;
 
 }
+
+type SerializedMemory = string;
