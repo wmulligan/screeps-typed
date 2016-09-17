@@ -4,7 +4,7 @@ type Extension = StructureExtension;
  * Contains energy which can be spent on spawning bigger creeps. Extensions can be placed anywhere in the room, any spawns will be able to
  * use them regardless of distance.
  */
-declare class StructureExtension extends OwnedStructure<Extension> {
+declare class StructureExtension extends OwnedStructure {
 
   /**
    * The amount of energy containing in the extension.
@@ -15,6 +15,20 @@ declare class StructureExtension extends OwnedStructure<Extension> {
    * The total amount of energy the extension can contain.
    */
   public readonly energyCapacity: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Extension>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Extension>;
 
   /**
    * CPU cost: CONST

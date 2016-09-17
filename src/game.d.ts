@@ -60,7 +60,7 @@ interface Game {
   /**
    * A hash containing all your structures with structure id as hash keys.
    */
-  readonly structures: {[structureId: string]: Structure<any>};
+  readonly structures: {[structureId: string]: Structure};
 
   /**
    * System game tick counter. It is automatically incremented on every tick.

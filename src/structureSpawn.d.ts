@@ -4,7 +4,7 @@ type Spawn = StructureSpawn;
  * Spawn is your colony center. This structure can create, renew, and recycle creeps. All your spawns are accessible through Game.spawns
  * hash list. Spawns auto-regenerate a little amount of energy each tick, so that you can easily recover even if all your creeps died.
  */
-declare class StructureSpawn extends OwnedStructure<Spawn> {
+declare class StructureSpawn extends OwnedStructure {
 
   /**
    * The amount of energy containing in the spawn.
@@ -31,6 +31,20 @@ declare class StructureSpawn extends OwnedStructure<Spawn> {
    * If the spawn is in process of spawning a new creep, this object will contain the new creep’s information, or null otherwise.
    */
   public readonly spawning: SpawningCreep;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Spawn>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Spawn>;
 
   /**
    * CPU cost: LOW

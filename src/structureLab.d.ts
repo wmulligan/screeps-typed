@@ -3,7 +3,7 @@ type Lab = StructureLab;
 /**
  * Produces mineral compounds from base minerals and boosts creeps.
  */
-declare class StructureLab extends OwnedStructure<Lab> {
+declare class StructureLab extends OwnedStructure {
 
   /**
    * The amount of game ticks the lab has to wait until the next reaction is possible.
@@ -34,6 +34,20 @@ declare class StructureLab extends OwnedStructure<Lab> {
    * The total amount of minerals the lab can contain.
    */
   public readonly mineralCapacity: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Lab>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Lab>;
 
   /**
    * CPU cost: CONST

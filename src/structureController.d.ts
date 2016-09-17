@@ -5,7 +5,7 @@ type Controller = StructureController;
  * cannot be damaged or destroyed. It can be addressed by `Room.controller`
  * property.
  */
-declare class StructureController extends OwnedStructure<Controller> {
+declare class StructureController extends OwnedStructure {
 
   /**
    * Current controller level, from 0 to 8.
@@ -37,6 +37,20 @@ declare class StructureController extends OwnedStructure<Controller> {
    * The amount of game ticks while this controller cannot be upgraded due to attack.
    */
   public readonly upgradeBlocked: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Controller>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Controller>;
 
   /**
    * CPU cost: CONST

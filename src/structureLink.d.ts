@@ -3,7 +3,7 @@ type Link = StructureLink;
 /**
  * Remotely transfers energy to another Link in the same room.
  */
-declare class StructureLink extends OwnedStructure<Link> {
+declare class StructureLink extends OwnedStructure {
 
   /**
    * The amount of game ticks the link has to wait until the next transfer is possible.
@@ -19,6 +19,20 @@ declare class StructureLink extends OwnedStructure<Link> {
    * The total amount of energy the link can contain.
    */
   public readonly energyCapacity: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Link>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Link>;
 
   /**
    * CPU cost: CONST

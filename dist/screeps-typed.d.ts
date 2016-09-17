@@ -73,7 +73,7 @@ interface LookAtResult {
   exit?: FindType<RoomPosition>;
   flag?: Flag;
   source?: Source;
-  structure?: Structure<any>;
+  structure?: Structure;
   terrain?: TerrainType;
 }
 
@@ -184,7 +184,7 @@ declare const ERR_RCL_NOT_ENOUGH: ResponseCode;
 declare const ERR_GCL_NOT_ENOUGH: ResponseCode;
 
 // Structures
-declare class StructureType<T> extends String { // tslint:disable-line
+declare class StructureType<T extends Structure> extends String { // tslint:disable-line
   private readonly __type__: T; // tslint:disable-line
 }
 
@@ -197,7 +197,7 @@ declare const STRUCTURE_KEEPER_LAIR: StructureType<KeeperLair>;
 declare const STRUCTURE_PORTAL: StructureType<Portal>;
 declare const STRUCTURE_CONTROLLER: StructureType<Controller>;
 declare const STRUCTURE_LINK: StructureType<Link>;
-declare const STRUCTURE_STORAGE: StructureType<StructureStorage>;
+declare const STRUCTURE_STORAGE: StructureType<SStorage>;
 declare const STRUCTURE_TOWER: StructureType<Tower>;
 declare const STRUCTURE_OBSERVER: StructureType<Observer>;
 declare const STRUCTURE_POWER_BANK: StructureType<PowerBank>;
@@ -239,9 +239,9 @@ declare const FIND_SOURCES_ACTIVE: FindType<Source>;
 declare const FIND_SOURCES: FindType<Source>;
 declare const FIND_DROPPED_ENERGY: FindType<Resource>;
 declare const FIND_DROPPED_RESOURCES: FindType<Resource>;
-declare const FIND_STRUCTURES: FindType<Structure<any>>;
-declare const FIND_MY_STRUCTURES: FindType<Structure<any>>;
-declare const FIND_HOSTILE_STRUCTURES: FindType<Structure<any>>;
+declare const FIND_STRUCTURES: FindType<Structure>;
+declare const FIND_MY_STRUCTURES: FindType<Structure>;
+declare const FIND_HOSTILE_STRUCTURES: FindType<Structure>;
 declare const FIND_FLAGS: FindType<Flag>;
 declare const FIND_MY_SPAWNS: FindType<Spawn>;
 declare const FIND_HOSTILE_SPAWNS: FindType<Spawn>;
@@ -273,7 +273,7 @@ declare const LOOK_ENERGY: LookType<Resource>;
 declare const LOOK_RESOURCES: LookType<Resource>;
 declare const LOOK_SOURCES: LookType<Source>;
 declare const LOOK_MINERALS: LookType<Mineral>;
-declare const LOOK_STRUCTURES: LookType<Structure<any>>;
+declare const LOOK_STRUCTURES: LookType<Structure>;
 declare const LOOK_FLAGS: LookType<Flag>;
 declare const LOOK_CONSTRUCTION_SITES: LookType<ConstructionSite>;
 declare const LOOK_NUKES: LookType<Nuke>;
@@ -351,7 +351,7 @@ interface TerrainType extends String {
 
 // variables since they get defined by us
 declare var TERRAIN_PLAIN: TerrainType;
-declare var TERRAIN_SPAWN: TerrainType;
+declare var TERRAIN_SWAMP: TerrainType;
 declare var TERRAIN_WALL: TerrainType;
 
 // RoomModes
@@ -473,6 +473,13 @@ declare class Creep extends RoomObject {
   public readonly owner: Owner;
 
   /**
+   * The link to the Room object.
+   *
+   * NOTE: we override the room from RoomObject since we are guaranteed that this is not undefined
+   */
+  public readonly room: Room;
+
+  /**
    * The text message that the creep was saying at the last tick.
    */
   public readonly saying: string;
@@ -497,7 +504,7 @@ declare class Creep extends RoomObject {
    * @param target The target object to be attacked.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  public attack(target: Creep | Structure<any>): ResponseCode;
+  public attack(target: Creep | Structure): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -555,7 +562,7 @@ declare class Creep extends RoomObject {
    * @param target The target structure.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  public dismantle(target: Structure<any>): ResponseCode;
+  public dismantle(target: Structure): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -681,7 +688,7 @@ declare class Creep extends RoomObject {
    * @param target The target object to be attacked.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  public rangedAttack(target: Creep | Structure<any>): ResponseCode;
+  public rangedAttack(target: Creep | Structure): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -713,7 +720,7 @@ declare class Creep extends RoomObject {
    * @param target he target structure to be repaired.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  public repair(target: Structure<any>): ResponseCode;
+  public repair(target: Structure): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -759,7 +766,7 @@ declare class Creep extends RoomObject {
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE,
    *     ERR_INVALID_ARGS
    */
-  public transfer(target: Creep | Structure<any>, resourceType: ResourceType, amount?: number): ResponseCode;
+  public transfer(target: Creep | Structure, resourceType: ResourceType, amount?: number): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -787,7 +794,7 @@ declare class Creep extends RoomObject {
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE,
    *     ERR_INVALID_ARGS
    */
-  public withdraw(target: Structure<any>, resourceType: ResourceType, amount?: number): ResponseCode;
+  public withdraw(target: Structure, resourceType: ResourceType, amount?: number): ResponseCode;
 
 }
 
@@ -963,7 +970,7 @@ interface Game {
   /**
    * A hash containing all your structures with structure id as hash keys.
    */
-  readonly structures: {[structureId: string]: Structure<any>};
+  readonly structures: {[structureId: string]: Structure};
 
   /**
    * System game tick counter. It is automatically incremented on every tick.
@@ -1257,7 +1264,7 @@ declare class Nuke extends RoomObject {
  * The base prototype for a structure that has an owner. Such structures can be found using FIND_MY_STRUCTURES and FIND_HOSTILE_STRUCTURES
  * constants.
  */
-declare abstract class OwnedStructure<T> extends Structure<T> {
+declare abstract class OwnedStructure extends Structure {
 
   /**
    * Whether this is your own structure. Walls and roads don't have this property as they are considered neutral
@@ -1269,6 +1276,13 @@ declare abstract class OwnedStructure<T> extends Structure<T> {
    * An object with the structure’s owner info (if present) containing the following properties: username
    */
   public readonly owner: Owner;
+
+  /**
+   * The link to the Room object.
+   *
+   * NOTE: we override the room from RoomObject since we are guaranteed that this is not undefined
+   */
+  public readonly room: Room;
 
 }
 declare const PathFinder: PathFinder;
@@ -1342,6 +1356,17 @@ interface SearchResult {
    * Total number of operations performed before this path was calculated.
    */
   readonly ops: number;
+
+  /**
+   * The total cost of the path as derived from `plainCost`, `swampCost` and any given CostMatrix instances.
+   */
+  readonly cost: number;
+
+  /**
+   * If the pathfinder fails to find a complete path, this will be true. Note that `path` will still be populated with a partial path which
+   * represents the closest path it could find given the search parameters.
+   */
+  readonly incomplete: boolean;
 
 }
 
@@ -1562,7 +1587,7 @@ declare class Room {
   /**
    * The Storage structure of this room, if present, otherwise undefined.
    */
-  public readonly storage: StructureStorage;
+  public readonly storage: SStorage;
 
   /**
    * The Terminal structure of this room, if present, otherwise undefined.
@@ -2095,7 +2120,7 @@ declare class Source extends RoomObject {
 /**
  * The base prototype object of all structures.
  */
-declare abstract class Structure<T> extends RoomObject {
+declare abstract class Structure extends RoomObject {
 
   /**
    * The current amount of hit points of the structure.
@@ -2110,12 +2135,12 @@ declare abstract class Structure<T> extends RoomObject {
   /**
    * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
    */
-  public readonly id: StructureId<T>;
+  public readonly id: StructureId<any>;
 
   /**
    * One of the STRUCTURE_* constants.
    */
-  public readonly structureType: StructureType<T>;
+  public readonly structureType: StructureType<any>;
 
   /**
    * CPU cost: CONST
@@ -2153,7 +2178,21 @@ type Container = StructureContainer;
  * A small container that can be used to store resources. This is a walkable structure. All dropped resources automatically goes to the
  * container at the same tile.
  */
-declare class StructureContainer extends Structure<Container> {
+declare class StructureContainer extends Structure {
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Container>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Container>;
 
   /**
    * An object with the structure contents. Each object key is one of the RESOURCE_* constants, values are resources amounts.
@@ -2189,7 +2228,7 @@ type Controller = StructureController;
  * cannot be damaged or destroyed. It can be addressed by `Room.controller`
  * property.
  */
-declare class StructureController extends OwnedStructure<Controller> {
+declare class StructureController extends OwnedStructure {
 
   /**
    * Current controller level, from 0 to 8.
@@ -2223,6 +2262,20 @@ declare class StructureController extends OwnedStructure<Controller> {
   public readonly upgradeBlocked: number;
 
   /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Controller>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Controller>;
+
+  /**
    * CPU cost: CONST
    *
    * Make your claimed controller neutral again.
@@ -2252,7 +2305,7 @@ type Extension = StructureExtension;
  * Contains energy which can be spent on spawning bigger creeps. Extensions can be placed anywhere in the room, any spawns will be able to
  * use them regardless of distance.
  */
-declare class StructureExtension extends OwnedStructure<Extension> {
+declare class StructureExtension extends OwnedStructure {
 
   /**
    * The amount of energy containing in the extension.
@@ -2263,6 +2316,20 @@ declare class StructureExtension extends OwnedStructure<Extension> {
    * The total amount of energy the extension can contain.
    */
   public readonly energyCapacity: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Extension>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Extension>;
 
   /**
    * CPU cost: CONST
@@ -2283,7 +2350,21 @@ type Extractor = StructureExtractor;
 /**
  * Allows to harvest mineral deposits.
  */
-declare class StructureExtractor extends OwnedStructure<Extractor> {
+declare class StructureExtractor extends OwnedStructure {
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Extractor>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Extractor>;
 
 }
 type KeeperLair = StructureKeeperLair;
@@ -2292,12 +2373,26 @@ type KeeperLair = StructureKeeperLair;
  * Non-player structure. Spawns NPC Source Keepers that guards energy sources and minerals in some rooms. This structure cannot be
  * destroyed.
  */
-declare class StructureKeeperLair extends OwnedStructure<KeeperLair> {
+declare class StructureKeeperLair extends OwnedStructure {
 
   /**
    * Time to spawning of the next Source Keeper.
    */
   public readonly ticksToSpawn: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<KeeperLair>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<KeeperLair>;
 
 }
 type Lab = StructureLab;
@@ -2305,7 +2400,7 @@ type Lab = StructureLab;
 /**
  * Produces mineral compounds from base minerals and boosts creeps.
  */
-declare class StructureLab extends OwnedStructure<Lab> {
+declare class StructureLab extends OwnedStructure {
 
   /**
    * The amount of game ticks the lab has to wait until the next reaction is possible.
@@ -2336,6 +2431,20 @@ declare class StructureLab extends OwnedStructure<Lab> {
    * The total amount of minerals the lab can contain.
    */
   public readonly mineralCapacity: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Lab>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Lab>;
 
   /**
    * CPU cost: CONST
@@ -2384,7 +2493,7 @@ type Link = StructureLink;
 /**
  * Remotely transfers energy to another Link in the same room.
  */
-declare class StructureLink extends OwnedStructure<Link> {
+declare class StructureLink extends OwnedStructure {
 
   /**
    * The amount of game ticks the link has to wait until the next transfer is possible.
@@ -2400,6 +2509,20 @@ declare class StructureLink extends OwnedStructure<Link> {
    * The total amount of energy the link can contain.
    */
   public readonly energyCapacity: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Link>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Link>;
 
   /**
    * CPU cost: CONST
@@ -2421,7 +2544,7 @@ type Nuker = StructureNuker;
  * resources. Launching creates a Nuke object at the target room position which is visible to any player until it is landed. Incoming nuke
  * cannot be moved or cancelled. Nukes cannot be launched from or to novice rooms.
  */
-declare class StructureNuker extends OwnedStructure<Nuker> {
+declare class StructureNuker extends OwnedStructure {
 
   /**
    * The amount of energy contained in this structure.
@@ -2449,6 +2572,20 @@ declare class StructureNuker extends OwnedStructure<Nuker> {
   public readonly cooldown: number;
 
   /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Nuker>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Nuker>;
+
+  /**
    * CPU cost: CONST
    *
    * Launch a nuke to the specified position.
@@ -2464,7 +2601,21 @@ type Observer = StructureObserver;
 /**
  * Provides visibility into a distant room from your script.
  */
-declare class StructureObserver extends OwnedStructure<Observer> {
+declare class StructureObserver extends OwnedStructure {
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Observer>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Observer>;
 
   /**
    * CPU cost: CONST
@@ -2484,7 +2635,7 @@ type Portal = StructurePortal;
  * A non-player structure. Instantly teleports your creeps to a distant room acting as a room exit tile. Portals appear randomly in the
  * central room of each sector.
  */
-declare class StructurePortal extends Structure<Portal> {
+declare class StructurePortal extends Structure {
 
   /**
    * The position object in the destination room.
@@ -2496,6 +2647,20 @@ declare class StructurePortal extends Structure<Portal> {
    */
   public ticksToDecay: number | undefined;
 
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Portal>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Portal>;
+
 }
 type PowerBank = StructurePowerBank;
 
@@ -2503,7 +2668,7 @@ type PowerBank = StructurePowerBank;
  * Non-player structure. Contains power resource which can be obtained by destroying the structure. Hits the attacker creep back on each
  * attack.
  */
-declare class StructurePowerBank extends OwnedStructure<PowerBank> {
+declare class StructurePowerBank extends OwnedStructure {
 
   /**
    * The amount of power containing.
@@ -2515,20 +2680,49 @@ declare class StructurePowerBank extends OwnedStructure<PowerBank> {
    */
   public readonly ticksToDecay: number;
 
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<PowerBank>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<PowerBank>;
+
 }
 type PowerSpawn = StructurePowerSpawn;
 
 /**
  * Processes power into your account, and spawns power creeps with special unique powers (in development).
  */
-declare class StructurePowerSpawn extends OwnedStructure<PowerSpawn> {
+declare class StructurePowerSpawn extends OwnedStructure {
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<PowerSpawn>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<PowerSpawn>;
+
 }
 type Rampart = StructureRampart;
 
 /**
  * Blocks movement of hostile creeps, and defends your creeps and structures on the same tile. Can be used as a controllable gate.
  */
-declare class StructureRampart extends OwnedStructure<Rampart> {
+declare class StructureRampart extends OwnedStructure {
 
   /**
    * If false (default), only your creeps can step on the same square. If true, any hostile creeps can pass through.
@@ -2539,6 +2733,20 @@ declare class StructureRampart extends OwnedStructure<Rampart> {
    * The amount of game ticks when this rampart will lose some hit points.
    */
   public readonly ticksToDecay: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Rampart>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Rampart>;
 
   /**
    * CPU cost: CONST
@@ -2556,12 +2764,26 @@ type Road = StructureRoad;
 /**
  * Decreases movement cost to 1. Using roads allows creating creeps with less MOVE body parts.
  */
-declare class StructureRoad extends Structure<Road> {
+declare class StructureRoad extends Structure {
 
   /**
    * The amount of game ticks when this road will lose some hit points.
    */
   public readonly ticksToDecay: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Road>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Road>;
 
 }
 type Spawn = StructureSpawn;
@@ -2570,7 +2792,7 @@ type Spawn = StructureSpawn;
  * Spawn is your colony center. This structure can create, renew, and recycle creeps. All your spawns are accessible through Game.spawns
  * hash list. Spawns auto-regenerate a little amount of energy each tick, so that you can easily recover even if all your creeps died.
  */
-declare class StructureSpawn extends OwnedStructure<Spawn> {
+declare class StructureSpawn extends OwnedStructure {
 
   /**
    * The amount of energy containing in the spawn.
@@ -2597,6 +2819,20 @@ declare class StructureSpawn extends OwnedStructure<Spawn> {
    * If the spawn is in process of spawning a new creep, this object will contain the new creep’s information, or null otherwise.
    */
   public readonly spawning: SpawningCreep;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Spawn>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Spawn>;
 
   /**
    * CPU cost: LOW
@@ -2682,13 +2918,13 @@ interface SpawningCreep {
   readonly remainingTime: number;
 
 }
-// type Storage = StructureStorage;
+type SStorage = StructureStorage; // Storage is already defined in browser
 
 /**
  * A structure that can store huge amount of resource units. Only one structure per room is allowed that can be addressed by Room.storage
  * property.
  */
-declare class StructureStorage extends OwnedStructure<StructureStorage> {
+declare class StructureStorage extends OwnedStructure {
 
   /**
    * An object with the storage contents. Each object key is one of the RESOURCE_* constants, values are resources amounts. RESOURCE_ENERGY
@@ -2701,6 +2937,20 @@ declare class StructureStorage extends OwnedStructure<StructureStorage> {
    * The total amount of resources the storage can contain.
    */
   public readonly storeCapacity: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<SStorage>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<SStorage>;
 
   /**
    * CPU cost: CONST
@@ -2726,7 +2976,7 @@ type Terminal = StructureTerminal;
  * energy units. You can track your incoming and outgoing transactions using the Game.market object. Only one Terminal per room is allowed
  * that can be addressed by Room.terminal property.
  */
-declare class StructureTerminal extends OwnedStructure<Terminal> {
+declare class StructureTerminal extends OwnedStructure {
 
   /**
    * An object with the storage contents. Each object key is one of the RESOURCE_* constants, values are resources amounts. RESOURCE_ENERGY
@@ -2739,6 +2989,20 @@ declare class StructureTerminal extends OwnedStructure<Terminal> {
    * The total amount of resources the storage can contain.
    */
   public readonly storeCapacity: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Terminal>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Terminal>;
 
   /**
    * CPU cost: CONST
@@ -2775,7 +3039,7 @@ type Tower = StructureTower;
  * Remotely attacks or heals creeps, or repairs structures. Can be targeted to any object in the room. However, its effectiveness linearly
  * depends on the distance. Each action consumes energy.
  */
-declare class StructureTower extends OwnedStructure<Tower> {
+declare class StructureTower extends OwnedStructure {
 
   /**
    * The amount of energy containing in this structure.
@@ -2786,6 +3050,20 @@ declare class StructureTower extends OwnedStructure<Tower> {
    * The total amount of energy this structure can contain.
    */
   public readonly energyCapacity: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Tower>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Tower>;
 
   /**
    * CPU cost: CONST
@@ -2818,7 +3096,7 @@ declare class StructureTower extends OwnedStructure<Tower> {
    * @param target The target structure.
    * @returns Return code: OK, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_RCL_NOT_ENOUGH
    */
-  public repair(target: Structure<any>): ResponseCode;
+  public repair(target: Structure): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -2839,11 +3117,25 @@ type Wall = StructureWall;
 /**
  * Blocks movement of all creeps.
  */
-declare class StructureWall extends Structure<Wall> {
+declare class StructureWall extends Structure {
 
   /**
    * The amount of game ticks when the wall will disappear (only for automatically placed border walls at the start of the game).
    */
   public readonly ticksToLive: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Wall>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Wall>;
 
 }

@@ -73,7 +73,7 @@ interface LookAtResult {
   exit?: FindType<RoomPosition>;
   flag?: Flag;
   source?: Source;
-  structure?: Structure<any>;
+  structure?: Structure;
   terrain?: TerrainType;
 }
 

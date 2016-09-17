@@ -58,7 +58,7 @@ declare class Room {
   /**
    * The Storage structure of this room, if present, otherwise undefined.
    */
-  public readonly storage: StructureStorage;
+  public readonly storage: SStorage;
 
   /**
    * The Terminal structure of this room, if present, otherwise undefined.

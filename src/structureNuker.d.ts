@@ -5,7 +5,7 @@ type Nuker = StructureNuker;
  * resources. Launching creates a Nuke object at the target room position which is visible to any player until it is landed. Incoming nuke
  * cannot be moved or cancelled. Nukes cannot be launched from or to novice rooms.
  */
-declare class StructureNuker extends OwnedStructure<Nuker> {
+declare class StructureNuker extends OwnedStructure {
 
   /**
    * The amount of energy contained in this structure.
@@ -31,6 +31,20 @@ declare class StructureNuker extends OwnedStructure<Nuker> {
    * The amount of game ticks the link has to wait until the next transfer is possible.
    */
   public readonly cooldown: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Nuker>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Nuker>;
 
   /**
    * CPU cost: CONST

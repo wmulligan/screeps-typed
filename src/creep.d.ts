@@ -62,6 +62,13 @@ declare class Creep extends RoomObject {
   public readonly owner: Owner;
 
   /**
+   * The link to the Room object.
+   *
+   * NOTE: we override the room from RoomObject since we are guaranteed that this is not undefined
+   */
+  public readonly room: Room;
+
+  /**
    * The text message that the creep was saying at the last tick.
    */
   public readonly saying: string;
@@ -86,7 +93,7 @@ declare class Creep extends RoomObject {
    * @param target The target object to be attacked.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  public attack(target: Creep | Structure<any>): ResponseCode;
+  public attack(target: Creep | Structure): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -144,7 +151,7 @@ declare class Creep extends RoomObject {
    * @param target The target structure.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  public dismantle(target: Structure<any>): ResponseCode;
+  public dismantle(target: Structure): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -270,7 +277,7 @@ declare class Creep extends RoomObject {
    * @param target The target object to be attacked.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  public rangedAttack(target: Creep | Structure<any>): ResponseCode;
+  public rangedAttack(target: Creep | Structure): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -302,7 +309,7 @@ declare class Creep extends RoomObject {
    * @param target he target structure to be repaired.
    * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_NOT_IN_RANGE, ERR_NO_BODYPART
    */
-  public repair(target: Structure<any>): ResponseCode;
+  public repair(target: Structure): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -348,7 +355,7 @@ declare class Creep extends RoomObject {
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE,
    *     ERR_INVALID_ARGS
    */
-  public transfer(target: Creep | Structure<any>, resourceType: ResourceType, amount?: number): ResponseCode;
+  public transfer(target: Creep | Structure, resourceType: ResourceType, amount?: number): ResponseCode;
 
   /**
    * CPU cost: CONST
@@ -376,7 +383,7 @@ declare class Creep extends RoomObject {
    * @returns Result code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE,
    *     ERR_INVALID_ARGS
    */
-  public withdraw(target: Structure<any>, resourceType: ResourceType, amount?: number): ResponseCode;
+  public withdraw(target: Structure, resourceType: ResourceType, amount?: number): ResponseCode;
 
 }
 

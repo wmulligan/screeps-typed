@@ -4,7 +4,21 @@ type Container = StructureContainer;
  * A small container that can be used to store resources. This is a walkable structure. All dropped resources automatically goes to the
  * container at the same tile.
  */
-declare class StructureContainer extends Structure<Container> {
+declare class StructureContainer extends Structure {
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Container>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Container>;
 
   /**
    * An object with the structure contents. Each object key is one of the RESOURCE_* constants, values are resources amounts.

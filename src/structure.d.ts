@@ -1,7 +1,7 @@
 /**
  * The base prototype object of all structures.
  */
-declare abstract class Structure<T> extends RoomObject {
+declare abstract class Structure extends RoomObject {
 
   /**
    * The current amount of hit points of the structure.
@@ -16,12 +16,12 @@ declare abstract class Structure<T> extends RoomObject {
   /**
    * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
    */
-  public readonly id: StructureId<T>;
+  public readonly id: StructureId<any>;
 
   /**
    * One of the STRUCTURE_* constants.
    */
-  public readonly structureType: StructureType<T>;
+  public readonly structureType: StructureType<any>;
 
   /**
    * CPU cost: CONST

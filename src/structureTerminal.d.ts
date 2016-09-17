@@ -7,7 +7,7 @@ type Terminal = StructureTerminal;
  * energy units. You can track your incoming and outgoing transactions using the Game.market object. Only one Terminal per room is allowed
  * that can be addressed by Room.terminal property.
  */
-declare class StructureTerminal extends OwnedStructure<Terminal> {
+declare class StructureTerminal extends OwnedStructure {
 
   /**
    * An object with the storage contents. Each object key is one of the RESOURCE_* constants, values are resources amounts. RESOURCE_ENERGY
@@ -20,6 +20,20 @@ declare class StructureTerminal extends OwnedStructure<Terminal> {
    * The total amount of resources the storage can contain.
    */
   public readonly storeCapacity: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Terminal>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Terminal>;
 
   /**
    * CPU cost: CONST

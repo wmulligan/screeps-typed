@@ -4,7 +4,7 @@ type Tower = StructureTower;
  * Remotely attacks or heals creeps, or repairs structures. Can be targeted to any object in the room. However, its effectiveness linearly
  * depends on the distance. Each action consumes energy.
  */
-declare class StructureTower extends OwnedStructure<Tower> {
+declare class StructureTower extends OwnedStructure {
 
   /**
    * The amount of energy containing in this structure.
@@ -15,6 +15,20 @@ declare class StructureTower extends OwnedStructure<Tower> {
    * The total amount of energy this structure can contain.
    */
   public readonly energyCapacity: number;
+
+  /**
+   * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly id: StructureId<Tower>;
+
+  /**
+   * One of the STRUCTURE_* constants.
+   *
+   * NOTE: we override the room from Structure since we are guaranteed the type
+   */
+  public readonly structureType: StructureType<Tower>;
 
   /**
    * CPU cost: CONST
@@ -47,7 +61,7 @@ declare class StructureTower extends OwnedStructure<Tower> {
    * @param target The target structure.
    * @returns Return code: OK, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_RCL_NOT_ENOUGH
    */
-  public repair(target: Structure<any>): ResponseCode;
+  public repair(target: Structure): ResponseCode;
 
   /**
    * CPU cost: CONST
