@@ -101,7 +101,7 @@ declare class Room {
    * @param secondaryColor The secondary color of a new flag. Should be one of the COLOR_* constants. The default value is equal to color.
    * @returns Result Code: OK, ERR_NAME_EXISTS, ERR_INVALID_ARGS
    */
-  public createFlag(x: number, y: number, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode;
+  public createFlag(x: number, y: number, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode | FlagName;
 
   /**
    * CPU cost: CONST
@@ -115,7 +115,7 @@ declare class Room {
    * @param secondaryColor The secondary color of a new flag. Should be one of the COLOR_* constants. The default value is equal to color.
    * @returns Result Code: OK, ERR_NAME_EXISTS, ERR_INVALID_ARGS
    */
-  public createFlag(pos: RoomPosition | RoomObject, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode;
+  public createFlag(pos: RoomPosition | RoomObject, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode | FlagName;
 
   /**
    * CPU cost: AVERAGE
