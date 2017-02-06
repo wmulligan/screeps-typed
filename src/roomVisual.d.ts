@@ -79,11 +79,11 @@ interface LineStyle {
 }
 
 interface PolyStyle {
-    fill: string;
-    opacity: number;
-    stroke: string | undefined;
-    strokeWidth: number;
-    lineStyle: undefined | "dashed" | "dotted";
+    fill?: string;
+    opacity?: number;
+    stroke?: string;
+    strokeWidth?: number;
+    lineStyle?: "dashed" | "dotted";
 }
 
 interface CircleStyle extends PolyStyle {

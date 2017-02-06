@@ -414,19 +414,19 @@ interface MoveToOpts {
    * ticks which the path should be reused for. The default value is 5. Increase the amount to save more CPU, decrease to make the movement
    * more consistent. Set to 0 if you want to disable path reusing.
    */
-  reusePath: number;
+  reusePath?: number;
 
   /**
    * If reusePath is enabled and this option is set to true, the path will be stored in memory in the short serialized form using
    * Room.serializePath. The default value is true.
    */
-  serializeMemory: boolean;
+  serializeMemory?: boolean;
 
   /**
    * If this option is set to true, moveTo method will return ERR_NOT_FOUND if there is no memorized path to reuse. This can significantly
    * save CPU time in some cases. The default value is false.
    */
-  noPathFinding: boolean;
+  noPathFinding?: boolean;
 
   /**
    * Draw a line along the creep’s path using RoomVisual.poly. You can provide either an empty object or custom style parameters.
