@@ -66,6 +66,11 @@ declare class Room {
   public readonly terminal: Terminal;
 
   /**
+   * A RoomVisual object for this room. You can use this object to draw simple shapes (lines, circles, text labels) in the room.
+  */
+  public readonly visual: RoomVisual;
+
+  /**
    * CPU cost: CONST
    *
    * Create new ConstructionSite at the specified location.

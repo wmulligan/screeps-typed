@@ -428,4 +428,9 @@ interface MoveToOpts {
    */
   noPathFinding: boolean;
 
+  /**
+   * Draw a line along the creep’s path using RoomVisual.poly. You can provide either an empty object or custom style parameters.
+   */
+  visualizePathStyle?: PolyStyle;
+
 }
