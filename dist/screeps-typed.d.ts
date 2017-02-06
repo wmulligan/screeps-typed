@@ -839,6 +839,11 @@ interface MoveToOpts {
    */
   noPathFinding: boolean;
 
+  /**
+   * Draw a line along the creep’s path using RoomVisual.poly. You can provide either an empty object or custom style parameters.
+   */
+  visualizePathStyle?: PolyStyle;
+
 }
 /**
  * A flag. Flags can be used to mark particular spots in a room. Flags are visible to their owners only.
@@ -1595,6 +1600,11 @@ declare class Room {
   public readonly terminal: Terminal;
 
   /**
+   * A RoomVisual object for this room. You can use this object to draw simple shapes (lines, circles, text labels) in the room.
+  */
+  public readonly visual: RoomVisual;
+
+  /**
    * CPU cost: CONST
    *
    * Create new ConstructionSite at the specified location.
@@ -1628,9 +1638,9 @@ declare class Room {
    *     the same name (hash key). If not defined, a random name will be generated.
    * @param color The color of a new flag. Should be one of the COLOR_* constants. The default value is COLOR_WHITE.
    * @param secondaryColor The secondary color of a new flag. Should be one of the COLOR_* constants. The default value is equal to color.
-   * @returns Result Code: OK, ERR_NAME_EXISTS, ERR_INVALID_ARGS
+   * @returns Result Code: FlagName, ERR_NAME_EXISTS, ERR_INVALID_ARGS
    */
-  public createFlag(x: number, y: number, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode;
+  public createFlag(x: number, y: number, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode | FlagName;
 
   /**
    * CPU cost: CONST
@@ -1642,9 +1652,9 @@ declare class Room {
    *     the same name (hash key). If not defined, a random name will be generated.
    * @param color The color of a new flag. Should be one of the COLOR_* constants. The default value is COLOR_WHITE.
    * @param secondaryColor The secondary color of a new flag. Should be one of the COLOR_* constants. The default value is equal to color.
-   * @returns Result Code: OK, ERR_NAME_EXISTS, ERR_INVALID_ARGS
+   * @returns Result Code: FlagName, ERR_NAME_EXISTS, ERR_INVALID_ARGS
    */
-  public createFlag(pos: RoomPosition | RoomObject, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode;
+  public createFlag(pos: RoomPosition | RoomObject, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode | FlagName;
 
   /**
    * CPU cost: AVERAGE
@@ -2091,7 +2101,104 @@ interface List<T> {
   [index: number]: T;
   length: number;
 }
-/**
+declare class RoomVisual {
+    /** The name of the room. */
+    roomName: string;
+
+    /**
+     * You can directly create new RoomVisual object in any room, even if it's invisible to your script.
+     * @param roomName The room name.
+     */
+    constructor(roomName: string);
+
+    /**
+     * Draw a line.
+     * @param x1 The start X coordinate.
+     * @param y1 The start Y coordinate.
+     * @param x2 The finish X coordinate.
+     * @param y2 The finish Y coordinate.
+     * @param style The (optional) style.
+     * @returns The RoomVisual object, for chaining.
+     */
+    line(x1: number, y1: number, x2: number, y2: number, style?: LineStyle): RoomVisual;
+
+    /**
+     * Draw a circle.
+     * @param x The X coordinate of the center.
+     * @param y The Y coordinate of the center.
+     * @param style The (optional) style.
+     * @returns The RoomVisual object, for chaining.
+     */
+    circle(x: number, y: number, style?: CircleStyle): RoomVisual;
+
+    /**
+     * Draw a rectangle.
+     * @param x The X coordinate of the top-left corner.
+     * @param y The Y coordinate of the top-left corner.
+     * @param w The width of the rectangle.
+     * @param h The height of the rectangle.
+     * @param style The (optional) style.
+     * @returns The RoomVisual object, for chaining.
+     */
+    rect(x: number, y: number, w: number, h: number, style?: PolyStyle): RoomVisual;
+
+    /**
+     * Draw a polygon.
+     * @param points An array of point coordinate arrays, i.e. [[0,0], [5,5], [5,10]].
+     * @param style The (optional) style.
+     * @returns The RoomVisual object, for chaining.
+     */
+    poly(points: [number, number][], style?: PolyStyle): RoomVisual;
+
+    /**
+     * Draw a text label.
+     * @param text The text message.
+     * @param x The X coordinate of the label baseline center point.
+     * @param y The Y coordinate of the label baseline center point.
+     * @param style The (optional) text style.
+     * @returns The RoomVisual object, for chaining.
+     */
+    text(text: string, x: number, y: number, style?: TextStyle): RoomVisual;
+
+    /**
+     * Remove all visuals from the room.
+     * @returns The RoomVisual object, for chaining.
+     */
+    clear(): RoomVisual;
+
+    /**
+     * Get the stored size of all visuals added in the room in the current tick.
+     * It must not exceed 512,000 (500 KB).
+     * @returns The size of the visuals in bytes.
+     */
+    getSize(): number;
+}
+
+interface LineStyle {
+    width: number;
+    color: string;
+    opacity: number;
+    lineStyle: undefined | "dashed" | "dotted";
+}
+
+interface PolyStyle {
+    fill: string;
+    opacity: number;
+    stroke: string | undefined;
+    strokeWidth: number;
+    lineStyle: undefined | "dashed" | "dotted";
+}
+
+interface CircleStyle extends PolyStyle {
+    radius: number;
+}
+
+interface TextStyle {
+    color: string;
+    size: number;
+    align: "center" | "left" | "right";
+    opacity: number;
+}/**
  * An energy source object. Can be harvested by creeps with a WORK body part.
  */
 declare class Source extends RoomObject {
