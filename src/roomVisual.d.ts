@@ -72,10 +72,10 @@ declare class RoomVisual {
 }
 
 interface LineStyle {
-    width: number;
-    color: string;
-    opacity: number;
-    lineStyle: undefined | "dashed" | "dotted";
+    width?: number;
+    color?: string;
+    opacity?: number;
+    lineStyle?: "dashed" | "dotted";
 }
 
 interface PolyStyle {
@@ -87,12 +87,12 @@ interface PolyStyle {
 }
 
 interface CircleStyle extends PolyStyle {
-    radius: number;
+    radius?: number;
 }
 
 interface TextStyle {
-    color: string;
-    size: number;
-    align: "center" | "left" | "right";
-    opacity: number;
+    color?: string;
+    size?: number;
+    align?: "center" | "left" | "right";
+    opacity?: number;
 }
