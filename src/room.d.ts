@@ -66,6 +66,11 @@ declare class Room {
   public readonly terminal: Terminal;
 
   /**
+   * A RoomVisual object for this room. You can use this object to draw simple shapes (lines, circles, text labels) in the room.
+  */
+  public readonly visual: RoomVisual;
+
+  /**
    * CPU cost: CONST
    *
    * Create new ConstructionSite at the specified location.
@@ -99,9 +104,9 @@ declare class Room {
    *     the same name (hash key). If not defined, a random name will be generated.
    * @param color The color of a new flag. Should be one of the COLOR_* constants. The default value is COLOR_WHITE.
    * @param secondaryColor The secondary color of a new flag. Should be one of the COLOR_* constants. The default value is equal to color.
-   * @returns Result Code: OK, ERR_NAME_EXISTS, ERR_INVALID_ARGS
+   * @returns Result Code: FlagName, ERR_NAME_EXISTS, ERR_INVALID_ARGS
    */
-  public createFlag(x: number, y: number, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode;
+  public createFlag(x: number, y: number, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode | FlagName;
 
   /**
    * CPU cost: CONST
@@ -113,9 +118,9 @@ declare class Room {
    *     the same name (hash key). If not defined, a random name will be generated.
    * @param color The color of a new flag. Should be one of the COLOR_* constants. The default value is COLOR_WHITE.
    * @param secondaryColor The secondary color of a new flag. Should be one of the COLOR_* constants. The default value is equal to color.
-   * @returns Result Code: OK, ERR_NAME_EXISTS, ERR_INVALID_ARGS
+   * @returns Result Code: FlagName, ERR_NAME_EXISTS, ERR_INVALID_ARGS
    */
-  public createFlag(pos: RoomPosition | RoomObject, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode;
+  public createFlag(pos: RoomPosition | RoomObject, name?: FlagNameOrString, color?: Color, secondaryColor?: Color): ResponseCode | FlagName;
 
   /**
    * CPU cost: AVERAGE
