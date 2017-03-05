@@ -1,12 +1,12 @@
 declare class RoomVisual {
     /** The name of the room. */
-    roomName: string;
+    roomName?: string;
 
     /**
      * You can directly create new RoomVisual object in any room, even if it's invisible to your script.
      * @param roomName The room name.
      */
-    constructor(roomName: string);
+    constructor(roomName?: string);
 
     /**
      * Draw a line.
@@ -72,10 +72,10 @@ declare class RoomVisual {
 }
 
 interface LineStyle {
-    width: number;
-    color: string;
-    opacity: number;
-    lineStyle: undefined | "dashed" | "dotted";
+    width?: number;
+    color?: string;
+    opacity?: number;
+    lineStyle?: "dashed" | "dotted";
 }
 
 interface PolyStyle {
@@ -87,12 +87,12 @@ interface PolyStyle {
 }
 
 interface CircleStyle extends PolyStyle {
-    radius: number;
+    radius?: number;
 }
 
 interface TextStyle {
-    color: string;
-    size: number;
-    align: "center" | "left" | "right";
-    opacity: number;
+    color?: string;
+    size?: number;
+    align?: "center" | "left" | "right";
+    opacity?: number;
 }
