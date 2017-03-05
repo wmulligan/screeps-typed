@@ -72,27 +72,90 @@ declare class RoomVisual {
 }
 
 interface LineStyle {
+    /**
+     * Line width, default is 0.1.
+     */
     width?: number;
+    /**
+     * Line color in any web format, default is #ffffff (white).
+     */
     color?: string;
+    /**
+     * Opacity value, default is 0.5.
+     */
     opacity?: number;
+    /**
+     * Either undefined (solid line), dashed, or dotted. Default is undefined.
+     */
     lineStyle?: "dashed" | "dotted";
 }
 
 interface PolyStyle {
+    /**
+     * Fill color in any web format, default is undefined (no fill).
+     */
     fill?: string;
+    /**
+     * Opacity value, default is 0.5.
+     */
     opacity?: number;
+    /**
+     * Stroke color in any web format, default is #ffffff (white).
+     */
     stroke?: string;
+    /**
+     * Stroke line width, default is 0.1.
+     */
     strokeWidth?: number;
+    /**
+     * Either undefined (solid line), dashed, or dotted. Default is undefined.
+     */
     lineStyle?: "dashed" | "dotted";
 }
 
 interface CircleStyle extends PolyStyle {
+    /**
+     * Circle radius, default is 0.15.
+     */
     radius?: number;
 }
 
 interface TextStyle {
+    /**
+     * Font color in any web format, default is #ffffff (white).
+     */
     color?: string;
-    size?: number;
+   /**
+    * Either a number or a string in one of the following forms:
+    *   0.7 - relative size in game coordinates
+    *   20px - absolute size in pixels
+    *   0.7 serif
+    *   bold italic 1.5 Times New Roman
+    */
+    font?: number | string;
+    /**
+     * Stroke color in any web format, default is undefined (no stroke).
+     */
+    stroke?: string;
+    /**
+     * Stroke width, default is 0.15.
+     */
+    strokeWidth?: number;
+    /**
+     * Background color in any web format, default is undefined (no background). When 
+     * background is enabled, text vertical align is set to middle (default is baseline).
+     */
+    background?: string;
+    /**
+     * Background rectangle padding, default is 0.3.
+     */
+    backgroundPadding?: number;
+    /**
+     * Text align, either center, left, or right. Default is center.
+     */
     align?: "center" | "left" | "right";
+    /**
+     * Opacity value, default is 1.0.
+     */
     opacity?: number;
 }
