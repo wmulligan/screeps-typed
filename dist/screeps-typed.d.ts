@@ -2230,10 +2230,10 @@ interface TextStyle {
     color?: string;
    /**
     * Either a number or a string in one of the following forms:
-    *   0.7 - relative size in game coordinates
-    *   20px - absolute size in pixels
-    *   0.7 serif
-    *   bold italic 1.5 Times New Roman
+    *   - 0.7 - relative size in game coordinates
+    *   - 20px - absolute size in pixels
+    *   - 0.7 serif
+    *   - bold italic 1.5 Times New Roman
     */
     font?: number | string;
     /**
@@ -2536,6 +2536,11 @@ declare class StructureExtractor extends OwnedStructure {
    * NOTE: we override the room from Structure since we are guaranteed the type
    */
   public readonly structureType: StructureType<Extractor>;
+
+  /**
+   * The amount of game ticks until the next harvest action is possible.
+   */
+  public readonly cooldown: number;
 
 }
 type KeeperLair = StructureKeeperLair;

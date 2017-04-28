@@ -19,4 +19,9 @@ declare class StructureExtractor extends OwnedStructure {
    */
   public readonly structureType: StructureType<Extractor>;
 
+  /**
+   * The amount of game ticks until the next harvest action is possible.
+   */
+  public readonly cooldown: number;
+
 }
