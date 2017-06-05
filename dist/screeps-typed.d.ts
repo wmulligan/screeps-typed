@@ -237,7 +237,6 @@ declare const FIND_MY_CREEPS: FindType<Creep>;
 declare const FIND_HOSTILE_CREEPS: FindType<Creep>;
 declare const FIND_SOURCES_ACTIVE: FindType<Source>;
 declare const FIND_SOURCES: FindType<Source>;
-declare const FIND_DROPPED_ENERGY: FindType<Resource>;
 declare const FIND_DROPPED_RESOURCES: FindType<Resource>;
 declare const FIND_STRUCTURES: FindType<Structure>;
 declare const FIND_MY_STRUCTURES: FindType<Structure>;
@@ -394,6 +393,7 @@ declare const CONTAINER_DECAY_TIME_OWNED: number;
 declare const CONTAINER_DECAY_TIME: number;
 declare const LINK_LOSS_RATIO: number;
 declare const LINK_CAPACITY: number;
+declare const ENERGY_REGEN_TIME: number;
 
 declare const CONTROLLER_STRUCTURES:
 {
@@ -1648,19 +1648,30 @@ declare const RawMemory: RawMemory;
  */
 interface RawMemory {
 
-  /**
-   * Get a raw string representation of the Memory object.
-   *
-   * @returns Returns a string value.
-   */
-  get(): SerializedMemory;
+    /**
+     * An object with asynchronous memory segments available on this tick. Each object key is the segment ID with data in string values. 
+     * Use RawMemory.setActiveSegments to fetch segments on the next tick. Segments data is saved automatically in the end of the tick. 
+     */
+    segments: string[];
 
-  /**
-   * Set new memory value.
-   * @param value New memory value as a string.
-   */
-  set(value: SerializedMemory): void;
+    /**
+     * Get a raw string representation of the Memory object.
+     * 
+     * @returns Returns a string value.
+     */
+    get(): SerializedMemory;
 
+    /**
+     * Set new memory value.
+     * @param value New memory value as a string.
+     */
+    set(value: SerializedMemory): void;
+
+    /**
+     * Request memory segments using the list of their IDs. Memory segments will become available on the next tick in RawMemory.segments object.
+     * @param ids An array of segment IDs. Each ID should be a number from 0 to 99. Maximum 10 segments can be active at the same time. Subsequent calls of setActiveSegments override previous ones.
+     */
+    setActiveSegments(ids: number[]): void;
 }
 
 type SerializedMemory = string;
