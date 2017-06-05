@@ -74,7 +74,6 @@ declare const FIND_MY_CREEPS: FindType<Creep>;
 declare const FIND_HOSTILE_CREEPS: FindType<Creep>;
 declare const FIND_SOURCES_ACTIVE: FindType<Source>;
 declare const FIND_SOURCES: FindType<Source>;
-declare const FIND_DROPPED_ENERGY: FindType<Resource>;
 declare const FIND_DROPPED_RESOURCES: FindType<Resource>;
 declare const FIND_STRUCTURES: FindType<Structure>;
 declare const FIND_MY_STRUCTURES: FindType<Structure>;
@@ -231,6 +230,7 @@ declare const CONTAINER_DECAY_TIME_OWNED: number;
 declare const CONTAINER_DECAY_TIME: number;
 declare const LINK_LOSS_RATIO: number;
 declare const LINK_CAPACITY: number;
+declare const ENERGY_REGEN_TIME: number;
 
 declare const CONTROLLER_STRUCTURES:
 {
