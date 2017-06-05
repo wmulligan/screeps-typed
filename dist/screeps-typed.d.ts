@@ -237,7 +237,6 @@ declare const FIND_MY_CREEPS: FindType<Creep>;
 declare const FIND_HOSTILE_CREEPS: FindType<Creep>;
 declare const FIND_SOURCES_ACTIVE: FindType<Source>;
 declare const FIND_SOURCES: FindType<Source>;
-declare const FIND_DROPPED_ENERGY: FindType<Resource>;
 declare const FIND_DROPPED_RESOURCES: FindType<Resource>;
 declare const FIND_STRUCTURES: FindType<Structure>;
 declare const FIND_MY_STRUCTURES: FindType<Structure>;
@@ -362,6 +361,57 @@ declare const MODE_SIMULATION: RoomModes;
 declare const MODE_SURVIVAL: RoomModes;
 declare const MODE_WORLD: RoomModes;
 declare const MODE_ARENA: RoomModes;
+
+declare const BODYPART_COST: {[part: string]: number};
+declare const OBSTACLE_OBJECT_TYPES: string[];
+declare const TOWER_POWER_ATTACK: number;
+declare const TOWER_POWER_HEAL: number;
+declare const TOWER_POWER_REPAIR: number;
+declare const TOWER_OPTIMAL_RANGE: number;
+declare const TOWER_FALLOFF_RANGE: number;
+declare const TOWER_FALLOFF: number;
+declare const CARRY_CAPACITY: number;
+declare const HARVEST_POWER: number;
+declare const HARVEST_MINERAL_POWER: number;
+declare const REPAIR_POWER: number;
+declare const DISMANTLE_POWER: number;
+declare const BUILD_POWER: number;
+declare const ATTACK_POWER: number;
+declare const UPGRADE_CONTROLLER_POWER: number;
+declare const RANGED_ATTACK_POWER: number;
+declare const HEAL_POWER: number;
+declare const RANGED_HEAL_POWER: number;
+declare const DISMANTLE_COST: number;
+declare const REPAIR_COST: number;
+declare const CREEP_LIFE_TIME: number;
+declare const RAMPART_DECAY_AMOUNT: number;
+declare const ROAD_DECAY_AMOUNT: number;
+declare const CONTAINER_DECAY: number;
+declare const RAMPART_DECAY_TIME: number;
+declare const ROAD_DECAY_TIME: number;
+declare const CONTAINER_DECAY_TIME_OWNED: number;
+declare const CONTAINER_DECAY_TIME: number;
+declare const LINK_LOSS_RATIO: number;
+declare const LINK_CAPACITY: number;
+declare const ENERGY_REGEN_TIME: number;
+
+declare const CONTROLLER_STRUCTURES:
+{
+	[type: string]: { [level: number]: number };
+	extension: { [level: number]: number };
+	spawn: { [level: number]: number };
+	link: { [level: number]: number };
+	road: { [level: number]: number };
+	constructedWall: { [level: number]: number };
+	rampart: { [level: number]: number };
+	storage: { [level: number]: number };
+	tower: { [level: number]: number };
+	observer: { [level: number]: number };
+	powerSpawn: { [level: number]: number };
+};
+
+declare const ORDER_BUY: "buy";
+declare const ORDER_SELL: "sell";
 /**
  * A site of a structure which is currently under construction. A construction site can be created using the 'Construct' button at the left
  * of the game field or the Room.createConstructionSite method. To build a structure on the construction site, give a worker creep some
@@ -1190,7 +1240,111 @@ interface RoomPathStep {
 
 }
 interface Market {
+	/**
+	 * Your current credits balance.
+	 */
+	credits: number;
+	/**
+	 * An array of the last 100 incoming transactions to your terminals
+	 */
+	incomingTransactions: Transaction[];
+	/**
+	 * An object with your active and inactive buy/sell orders on the market.
+	 */
+	orders: { [key: string]: Order };
+	/**
+	 * An array of the last 100 outgoing transactions from your terminals
+	 */
+	outgoingTransactions: Transaction[];
+	/**
+	 * Estimate the energy transaction cost of StructureTerminal.send and Market.deal methods. The formula: Math.ceil( amount * (Math.log(0.1*linearDistanceBetweenRooms + 0.9) + 0.1) )
+	 * @param amount Amount of resources to be sent.
+	 * @param roomName1 The name of the first room.
+	 * @param roomName2 The name of the second room.
+	 * @returns The amount of energy required to perform the transaction.
+	 */
+	calcTransactionCost(amount: number, roomName1: RoomNameOrString, roomName2: RoomNameOrString): number;
+	/**
+	 * Cancel a previously created order. The 5% fee is not returned.
+	 * @param orderId The order ID as provided in Game.market.orders
+	 * @returns Result Code: OK, ERR_INVALID_ARGS
+	 */
+	cancelOrder(orderId: string): number;
+	/**
+	 * Change the price of an existing order. If newPrice is greater than old price, you will be charged (newPrice-oldPrice)*remainingAmount*0.05 credits.
+	 * @param orderId The order ID as provided in Game.market.orders
+	 * @param newPrice The new order price.
+	 * @returns Result Code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_ARGS
+	 */
+	changeOrderPrice(orderId: string, newPrice: number): number;
+	/**
+	 * Create a market order in your terminal. You will be charged price*amount*0.05 credits when the order is placed.
+	 * The maximum orders count is 20 per player. You can create an order at any time with any amount,
+	 * it will be automatically activated and deactivated depending on the resource/credits availability.
+	 */
+	createOrder(type: string, resourceType: string, price: number, totalAmount: number, roomName?: string): number;
+	/**
+	 * Execute a trade deal from your Terminal to another player's Terminal using the specified buy/sell order.
+	 * Your Terminal will be charged energy units of transfer cost regardless of the order resource type.
+	 * You can use Game.market.calcTransactionCost method to estimate it.
+	 * When multiple players try to execute the same deal, the one with the shortest distance takes precedence.
+	 */
+	deal(orderId: string, amount: number, targetRoomName?: RoomNameOrString): number;
+	/**
+	 * Add more capacity to an existing order. It will affect remainingAmount and totalAmount properties. You will be charged price*addAmount*0.05 credits.
+	 * @param orderId The order ID as provided in Game.market.orders
+	 * @param addAmount How much capacity to add. Cannot be a negative value.
+	 * @returns Result Code: OK, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_ARGS
+	 */
+	extendOrder(orderId: string, addAmount: number): number;
+	/**
+	 * Get other players' orders currently active on the market.
+	 * @param filter (optional) An object or function that will filter the resulting list using the lodash.filter method.
+	 * @returns An array of objects containing order information.
+	 */
+	getAllOrders(filter?: OrderFilter | ((o: Order) => boolean)): Order[];
+	/**
+	 * Retrieve info for specific market order.
+	 * @param orderId The order ID
+	 * @returns An object with the order info. See getAllOrders for properties explanation.
+	 */
+	getOrderById(id: string): Order | null;
+}
 
+interface Transaction {
+	transactionId: string;
+	time: number;
+	sender?: { username: string };
+	recipient?: { username: string };
+	resourceType: string;
+	amount: number;
+	from: string;
+	to: string;
+	description: string;
+}
+
+interface Order {
+	id: string;
+	created: number;
+	active?: boolean;
+	type: string;
+	resourceType: string;
+	roomName?: string;
+	amount: number;
+	remainingAmount: number;
+	totalAmount?: number;
+	price: number;
+}
+
+interface OrderFilter {
+	id?: string;
+	created?: number;
+	type?: string;
+	resourceType?: string;
+	roomName?: string;
+	amount?: number;
+	remainingAmount?: number;
+	price?: number;
 }
 declare const Memory: Memory;
 
@@ -1494,19 +1648,30 @@ declare const RawMemory: RawMemory;
  */
 interface RawMemory {
 
-  /**
-   * Get a raw string representation of the Memory object.
-   *
-   * @returns Returns a string value.
-   */
-  get(): SerializedMemory;
+    /**
+     * An object with asynchronous memory segments available on this tick. Each object key is the segment ID with data in string values. 
+     * Use RawMemory.setActiveSegments to fetch segments on the next tick. Segments data is saved automatically in the end of the tick. 
+     */
+    segments: string[];
 
-  /**
-   * Set new memory value.
-   * @param value New memory value as a string.
-   */
-  set(value: SerializedMemory): void;
+    /**
+     * Get a raw string representation of the Memory object.
+     * 
+     * @returns Returns a string value.
+     */
+    get(): SerializedMemory;
 
+    /**
+     * Set new memory value.
+     * @param value New memory value as a string.
+     */
+    set(value: SerializedMemory): void;
+
+    /**
+     * Request memory segments using the list of their IDs. Memory segments will become available on the next tick in RawMemory.segments object.
+     * @param ids An array of segment IDs. Each ID should be a number from 0 to 99. Maximum 10 segments can be active at the same time. Subsequent calls of setActiveSegments override previous ones.
+     */
+    setActiveSegments(ids: number[]): void;
 }
 
 type SerializedMemory = string;
@@ -2230,10 +2395,10 @@ interface TextStyle {
     color?: string;
    /**
     * Either a number or a string in one of the following forms:
-    *   0.7 - relative size in game coordinates
-    *   20px - absolute size in pixels
-    *   0.7 serif
-    *   bold italic 1.5 Times New Roman
+    *   - 0.7 - relative size in game coordinates
+    *   - 20px - absolute size in pixels
+    *   - 0.7 serif
+    *   - bold italic 1.5 Times New Roman
     */
     font?: number | string;
     /**
@@ -2536,6 +2701,11 @@ declare class StructureExtractor extends OwnedStructure {
    * NOTE: we override the room from Structure since we are guaranteed the type
    */
   public readonly structureType: StructureType<Extractor>;
+
+  /**
+   * The amount of game ticks until the next harvest action is possible.
+   */
+  public readonly cooldown: number;
 
 }
 type KeeperLair = StructureKeeperLair;

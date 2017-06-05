@@ -127,10 +127,10 @@ interface TextStyle {
     color?: string;
    /**
     * Either a number or a string in one of the following forms:
-    *   0.7 - relative size in game coordinates
-    *   20px - absolute size in pixels
-    *   0.7 serif
-    *   bold italic 1.5 Times New Roman
+    *   - 0.7 - relative size in game coordinates
+    *   - 20px - absolute size in pixels
+    *   - 0.7 serif
+    *   - bold italic 1.5 Times New Roman
     */
     font?: number | string;
     /**
