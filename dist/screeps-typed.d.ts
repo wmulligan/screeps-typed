@@ -1282,7 +1282,7 @@ interface Market {
 	 * The maximum orders count is 20 per player. You can create an order at any time with any amount,
 	 * it will be automatically activated and deactivated depending on the resource/credits availability.
 	 */
-	createOrder(type: string, resourceType: string, price: number, totalAmount: number, roomName?: string): number;
+	createOrder(type: "buy" | "sell", resourceType: ResourceType, price: number, totalAmount: number, roomName?: RoomNameOrString): number;
 	/**
 	 * Execute a trade deal from your Terminal to another player's Terminal using the specified buy/sell order.
 	 * Your Terminal will be charged energy units of transfer cost regardless of the order resource type.
@@ -1316,10 +1316,10 @@ interface Transaction {
 	time: number;
 	sender?: { username: string };
 	recipient?: { username: string };
-	resourceType: string;
+	resourceType: ResourceType;
 	amount: number;
-	from: string;
-	to: string;
+	from: RoomName;
+	to: RoomName;
 	description: string;
 }
 
@@ -1327,9 +1327,9 @@ interface Order {
 	id: string;
 	created: number;
 	active?: boolean;
-	type: string;
-	resourceType: string;
-	roomName?: string;
+	type: "buy" | "sell";
+	resourceType: ResourceType;
+	roomName?: RoomName;
 	amount: number;
 	remainingAmount: number;
 	totalAmount?: number;
@@ -1339,9 +1339,9 @@ interface Order {
 interface OrderFilter {
 	id?: string;
 	created?: number;
-	type?: string;
-	resourceType?: string;
-	roomName?: string;
+	type?: "buy" | "sell";
+	resourceType?: ResourceType;
+	roomName?: RoomName;
 	amount?: number;
 	remainingAmount?: number;
 	price?: number;
