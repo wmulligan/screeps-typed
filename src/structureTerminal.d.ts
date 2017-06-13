@@ -36,6 +36,11 @@ declare class StructureTerminal extends OwnedStructure {
   public readonly structureType: StructureType<Terminal>;
 
   /**
+   * The remaining amount of ticks while this terminal cannot be used to make StructureTerminal.send or Game.market.deal calls.
+   */
+  public readonly cooldown: number;
+
+  /**
    * CPU cost: CONST
    *
    * Sends resource to a Terminal in another room with the specified name.
@@ -48,19 +53,4 @@ declare class StructureTerminal extends OwnedStructure {
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_ARGS
    */
   public send(resourceType: ResourceType, amount: number, destination: string, description?: string): ResponseCode;
-
-  /**
-   * CPU cost: CONST
-   *
-   * Transfer resource from this terminal to a creep. The target has to be at adjacent square. You can transfer resources to your creeps
-   * from hostile structures as well. This method is deprecated. Please use Creep.withdraw instead.
-   *
-   * @deprecated
-   * @param target The target object.
-   * @param resourceType One of the RESOURCE_* constants.
-   * @param amount The amount of resources to be transferred. If omitted, all the available amount is used.
-   * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE, ERR_INVALID_ARGS
-   */
-  public transfer(target: Creep, resourceType: ResourceType, amount?: number): ResponseCode;
-
 }

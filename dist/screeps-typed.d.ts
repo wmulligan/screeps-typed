@@ -3346,6 +3346,11 @@ declare class StructureTerminal extends OwnedStructure {
   public readonly structureType: StructureType<Terminal>;
 
   /**
+   * The remaining amount of ticks while this terminal cannot be used to make StructureTerminal.send or Game.market.deal calls.
+   */
+  public readonly cooldown: number;
+
+  /**
    * CPU cost: CONST
    *
    * Sends resource to a Terminal in another room with the specified name.
