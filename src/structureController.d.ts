@@ -1,5 +1,12 @@
 type Controller = StructureController;
 
+interface SignDefinition {
+    username: string;
+    text: string;
+    time: number,
+    datetime: Date;
+}
+
 /**
  * Claim this structure to take control over the room. The controller structure
  * cannot be damaged or destroyed. It can be addressed by `Room.controller`
@@ -26,6 +33,26 @@ declare class StructureController extends OwnedStructure {
    * An object with the controller reservation info if present: username, ticksToEnd
    */
   public readonly reservation: Reservation;
+
+  /**
+   * How many ticks of safe mode are remaining, or undefined.
+   */
+  public readonly safeMode: number | undefined;
+
+  /**
+   * Safe mode activations available to use.
+   */
+  public readonly safeModeAvailable: number;
+
+  /**
+   * During this period in ticks new safe mode activations will be blocked, undefined if cooldown is inactive.
+   */
+  public readonly safeModeCooldown: number | undefined;
+
+  /**
+   * An object with the controller sign info if present
+   */
+  public readonly sign: SignDefinition;
 
   /**
    * The amount of game ticks when this controller will lose one level. This timer can be reset by using
@@ -61,6 +88,11 @@ declare class StructureController extends OwnedStructure {
    */
   public unclaim(): ResponseCode;
 
+  /**
+   * Activate safe mode if available.
+   * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_TIRED
+   */
+  public activateSafeMode(): ResponseCode;
 }
 
 interface Reservation {
