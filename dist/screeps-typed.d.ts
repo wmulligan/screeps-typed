@@ -1282,7 +1282,7 @@ interface Market {
 	 * The maximum orders count is 20 per player. You can create an order at any time with any amount,
 	 * it will be automatically activated and deactivated depending on the resource/credits availability.
 	 */
-	createOrder(type: string, resourceType: string, price: number, totalAmount: number, roomName?: string): number;
+	createOrder(type: "buy" | "sell", resourceType: ResourceType, price: number, totalAmount: number, roomName?: RoomNameOrString): number;
 	/**
 	 * Execute a trade deal from your Terminal to another player's Terminal using the specified buy/sell order.
 	 * Your Terminal will be charged energy units of transfer cost regardless of the order resource type.
@@ -1316,10 +1316,10 @@ interface Transaction {
 	time: number;
 	sender?: { username: string };
 	recipient?: { username: string };
-	resourceType: string;
+	resourceType: ResourceType;
 	amount: number;
-	from: string;
-	to: string;
+	from: RoomName;
+	to: RoomName;
 	description: string;
 }
 
@@ -1327,9 +1327,9 @@ interface Order {
 	id: string;
 	created: number;
 	active?: boolean;
-	type: string;
-	resourceType: string;
-	roomName?: string;
+	type: "buy" | "sell";
+	resourceType: ResourceType;
+	roomName?: RoomName;
 	amount: number;
 	remainingAmount: number;
 	totalAmount?: number;
@@ -1339,9 +1339,9 @@ interface Order {
 interface OrderFilter {
 	id?: string;
 	created?: number;
-	type?: string;
-	resourceType?: string;
-	roomName?: string;
+	type?: "buy" | "sell";
+	resourceType?: ResourceType;
+	roomName?: RoomName;
 	amount?: number;
 	remainingAmount?: number;
 	price?: number;
@@ -2559,6 +2559,13 @@ declare class StructureContainer extends Structure {
 }
 type Controller = StructureController;
 
+interface SignDefinition {
+    username: string;
+    text: string;
+    time: number,
+    datetime: Date;
+}
+
 /**
  * Claim this structure to take control over the room. The controller structure
  * cannot be damaged or destroyed. It can be addressed by `Room.controller`
@@ -2585,6 +2592,26 @@ declare class StructureController extends OwnedStructure {
    * An object with the controller reservation info if present: username, ticksToEnd
    */
   public readonly reservation: Reservation;
+
+  /**
+   * How many ticks of safe mode are remaining, or undefined.
+   */
+  public readonly safeMode: number | undefined;
+
+  /**
+   * Safe mode activations available to use.
+   */
+  public readonly safeModeAvailable: number;
+
+  /**
+   * During this period in ticks new safe mode activations will be blocked, undefined if cooldown is inactive.
+   */
+  public readonly safeModeCooldown: number | undefined;
+
+  /**
+   * An object with the controller sign info if present
+   */
+  public readonly sign: SignDefinition;
 
   /**
    * The amount of game ticks when this controller will lose one level. This timer can be reset by using
@@ -2620,6 +2647,11 @@ declare class StructureController extends OwnedStructure {
    */
   public unclaim(): ResponseCode;
 
+  /**
+   * Activate safe mode if available.
+   * @returns Result Code: OK, ERR_NOT_OWNER, ERR_BUSY, ERR_NOT_ENOUGH_RESOURCES, ERR_TIRED
+   */
+  public activateSafeMode(): ResponseCode;
 }
 
 interface Reservation {
@@ -3292,21 +3324,6 @@ declare class StructureStorage extends OwnedStructure {
    * NOTE: we override the room from Structure since we are guaranteed the type
    */
   public readonly structureType: StructureType<SStorage>;
-
-  /**
-   * CPU cost: CONST
-   *
-   * Transfer resource from this terminal to a creep. The target has to be at adjacent square. You can transfer resources to your creeps
-   * from hostile structures as well. This method is deprecated. Please use Creep.withdraw instead.
-   *
-   * @deprecated
-   * @param target The target object.
-   * @param resourceType One of the RESOURCE_* constants.
-   * @param amount The amount of resources to be transferred. If omitted, all the available amount is used.
-   * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE, ERR_INVALID_ARGS
-   */
-  public transfer(target: Creep, resourceType: ResourceType, amount?: number): ResponseCode;
-
 }
 type Terminal = StructureTerminal;
 
@@ -3346,6 +3363,11 @@ declare class StructureTerminal extends OwnedStructure {
   public readonly structureType: StructureType<Terminal>;
 
   /**
+   * The remaining amount of ticks while this terminal cannot be used to make StructureTerminal.send or Game.market.deal calls.
+   */
+  public readonly cooldown: number;
+
+  /**
    * CPU cost: CONST
    *
    * Sends resource to a Terminal in another room with the specified name.
@@ -3358,21 +3380,6 @@ declare class StructureTerminal extends OwnedStructure {
    * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_ARGS
    */
   public send(resourceType: ResourceType, amount: number, destination: string, description?: string): ResponseCode;
-
-  /**
-   * CPU cost: CONST
-   *
-   * Transfer resource from this terminal to a creep. The target has to be at adjacent square. You can transfer resources to your creeps
-   * from hostile structures as well. This method is deprecated. Please use Creep.withdraw instead.
-   *
-   * @deprecated
-   * @param target The target object.
-   * @param resourceType One of the RESOURCE_* constants.
-   * @param amount The amount of resources to be transferred. If omitted, all the available amount is used.
-   * @returns Return code: OK, ERR_NOT_OWNER, ERR_NOT_ENOUGH_RESOURCES, ERR_INVALID_TARGET, ERR_FULL, ERR_NOT_IN_RANGE, ERR_INVALID_ARGS
-   */
-  public transfer(target: Creep, resourceType: ResourceType, amount?: number): ResponseCode;
-
 }
 type Tower = StructureTower;
 
